@@ -1,101 +1,142 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
+import { SymbolView } from 'expo-symbols';
+import { useRouter } from 'expo-router';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppText, Screen, ThemedView } from '@/components';
+import { BottomTabInset, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+import {
+  analyticsCards,
+  lowStockItems,
+  quickActions,
+  recentOrders,
+  shopInfo,
+  summaryStats,
+} from '@/services/dashboard-mock-data';
+import {
+  AnalyticsCard,
+  DashboardHeader,
+  OrderCard,
+  QuickActionCard,
+  SectionHeader,
+  StockCard,
+  SummaryCard,
+} from '@/components/dashboard';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import type { Order } from '@yugo/shared-types';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
 }
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const theme = useTheme();
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}> 
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <DashboardHeader
+          shopName={shopInfo.name}
+          greeting={`${getGreeting()}, ${shopInfo.name.split(' ')[0]}`}
+          date={new Date().toLocaleDateString(undefined, {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+          })}
+        />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-        <Text className="text-red-500 text-2xl font-bold">Shop keeper NativeWind Test</Text>
+        <SectionHeader title="Today Summary" subtitle="Key shop metrics for the day." />
+        <View style={styles.summaryGrid}>
+          {summaryStats.map(({ key, ...stat }) => (
+            <SummaryCard key={key} {...stat} />
+          ))}
+        </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        <View style={styles.sectionTop}>
+          <SectionHeader title="Quick Actions" subtitle="Jump into the most common workflows." />
+        </View>
+        <View style={styles.actionsGrid}>
+          {quickActions.map((action) => (
+            <QuickActionCard
+              key={action.key}
+              title={action.title}
+              description={action.description}
+              icon={action.icon}
+              onPress={() => router.push(action.href)}
+            />
+          ))}
+        </View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        <SectionHeader title="Recent Orders" subtitle="Monitor the latest orders in real time." />
+        <View style={styles.cardColumn}>
+          {recentOrders.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              onPress={() =>
+                router.push({ pathname: '/order-details', params: { orderId: order.id } })
+              }
+            />
+          ))}
+        </View>
+
+        <SectionHeader title="Low Stock" subtitle="Products that need restocking soon." />
+        <View style={styles.cardColumn}>
+          {lowStockItems.map((item) => (
+            <StockCard key={item.id} item={item} onRestock={() => router.push('/products')} />
+          ))}
+        </View>
+
+        <SectionHeader title="Analytics Preview" subtitle="Fresh business insights." />
+        <View style={styles.analyticsGrid}>
+          {analyticsCards.map(({ key, ...card }) => (
+            <AnalyticsCard key={key} {...card} />
+          ))}
+        </View>
+      </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+  content: {
+    padding: Spacing.four,
     gap: Spacing.four,
+    paddingBottom: BottomTabInset + Spacing.four,
   },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
+  summaryGrid: {
     gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  actionsGrid: {
+    gap: Spacing.three,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignContent: 'flex-start',
+    alignItems: 'flex-start',
+    width: '100%',
+  },
+  cardColumn: {
+    gap: Spacing.three,
+  },
+  analyticsGrid: {
+    gap: Spacing.three,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  sectionTop: {
+    marginTop: Spacing.two,
   },
 });
