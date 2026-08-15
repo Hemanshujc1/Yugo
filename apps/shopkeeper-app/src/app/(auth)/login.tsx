@@ -1,41 +1,58 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Pressable } from 'react-native';
+import { View, StyleSheet, TextInput, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { Screen, AppText, Button } from '@/components';
+import { Screen, AppText } from '@/components';
 import { palette } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { borderRadius } from '@/theme/borders';
 import { useTheme } from '@/hooks/use-theme';
+import { useAuth } from '@/hooks';
 
 export default function LoginScreen() {
   const theme = useTheme();
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isTouched, setIsTouched] = useState(false);
+  const { login } = useAuth();
 
-  // Sanitize input to only digits
-  const cleanNumber = phoneNumber.replace(/\D/g, '');
-  const isValid = cleanNumber.length === 10;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isTouched, setIsTouched] = useState({ email: false, password: false });
+  const [isSaving, setIsSaving] = useState(false);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  // Validation message logic
-  const getErrorMessage = () => {
-    if (!isTouched) return '';
-    if (cleanNumber.length === 0) {
-      return 'Mobile number is required';
+  // Email format validation helper
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmailValid = emailRegex.test(email.trim());
+  const isPasswordValid = password.length >= 6;
+  const isValid = isEmailValid && isPasswordValid;
+
+  const emailError = isTouched.email && !email.trim()
+    ? 'Email is required'
+    : isTouched.email && !isEmailValid
+      ? 'Please enter a valid email address'
+      : '';
+
+  const passwordError = isTouched.password && !password
+    ? 'Password is required'
+    : isTouched.password && !isPasswordValid
+      ? 'Password must be at least 6 characters'
+      : '';
+
+  const handleLogin = async () => {
+    if (!isValid || isSaving) return;
+
+    setIsSaving(true);
+    // Simulate minor loading latency
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    try {
+      // Login with credentials and navigate
+      login(email.trim(), 'Demo Shopkeeper', 'Yugo Supermart', '+91 98765 43210');
+      router.replace('/' as any);
+    } catch (err: any) {
+      Alert.alert('Login Failed', err.message || 'Something went wrong.');
+    } finally {
+      setIsSaving(false);
     }
-    if (cleanNumber.length < 10) {
-      return 'Please enter a valid 10-digit mobile number';
-    }
-    return '';
-  };
-
-  const errorMessage = getErrorMessage();
-
-  const handleTextChange = (text: string) => {
-    if (!isTouched) setIsTouched(true);
-    // Limit to digits only and max 10 chars
-    const digitsOnly = text.replace(/\D/g, '').slice(0, 10);
-    setPhoneNumber(digitsOnly);
   };
 
   return (
@@ -43,12 +60,9 @@ export default function LoginScreen() {
       <View style={styles.topSection}>
         {/* Header Back Button */}
         <Pressable
-          style={({ pressed }) => [
-            styles.backButton,
-            { backgroundColor: theme.backgroundElement },
-            pressed && styles.pressed,
-          ]}
-          onPress={() => router.back()}>
+          style={[styles.backButton, { backgroundColor: theme.backgroundElement }]}
+          onPress={() => router.back()}
+        >
           <SymbolView
             name={{ ios: 'chevron.left', android: 'chevron_left', web: 'chevron_left' }}
             size={18}
@@ -59,60 +73,87 @@ export default function LoginScreen() {
         {/* Title & Subtitle */}
         <View style={styles.header}>
           <AppText variant="h2" style={styles.title}>
-            Enter Mobile Number
+            Welcome Back
           </AppText>
           <AppText variant="body" style={{ color: theme.textSecondary }}>
-            We will send a 6-digit verification code to log in to your shopkeeper account.
+            Log in to manage your shopkeeper account.
           </AppText>
         </View>
 
-        {/* Phone Input Box with Static Country Code */}
+        {/* Email Input Field */}
         <View style={styles.inputContainer}>
           <AppText variant="label" weight="medium" style={{ color: theme.textSecondary }}>
-            MOBILE NUMBER
+            EMAIL ADDRESS
           </AppText>
-
           <View
             style={[
               styles.inputWrapper,
               {
                 backgroundColor: theme.backgroundElement,
-                borderColor: errorMessage ? palette.error : palette.gray[200],
+                borderColor: emailError ? palette.error : '#9CA3AF44',
               },
-            ]}>
-            {/* Static Country Code Selector Pill */}
-            <View style={[styles.countrySelector, { backgroundColor: theme.background }]}>
-              <AppText variant="body" style={styles.flagEmoji}>
-                🇮🇳
-              </AppText>
-              <AppText variant="body" weight="semiBold">
-                +91
-              </AppText>
-              <SymbolView
-                name={{ ios: 'chevron.down', android: 'arrow_drop_down', web: 'arrow_drop_down' }}
-                size={12}
-                tintColor={theme.textSecondary}
-              />
-            </View>
-
-            <View style={[styles.divider, { backgroundColor: theme.textSecondary }]} />
-
+            ]}
+          >
             <TextInput
               style={[styles.input, { color: theme.text }]}
-              placeholder="98765 43210"
+              placeholder="user@example.com"
               placeholderTextColor={theme.textSecondary}
-              keyboardType="number-pad"
-              value={phoneNumber}
-              onChangeText={handleTextChange}
-              onBlur={() => setIsTouched(true)}
-              maxLength={10}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              onBlur={() => setIsTouched((prev) => ({ ...prev, email: true }))}
             />
           </View>
-
-          {/* Validation Error Message */}
-          {Boolean(errorMessage) && (
+          {Boolean(emailError) && (
             <AppText variant="caption" style={styles.errorText}>
-              {errorMessage}
+              {emailError}
+            </AppText>
+          )}
+        </View>
+
+        {/* Password Input Field */}
+        <View style={styles.inputContainer}>
+          <AppText variant="label" weight="medium" style={{ color: theme.textSecondary }}>
+            PASSWORD
+          </AppText>
+          <View
+            style={[
+              styles.inputWrapper,
+              {
+                backgroundColor: theme.backgroundElement,
+                borderColor: passwordError ? palette.error : '#9CA3AF44',
+              },
+            ]}
+          >
+            <TextInput
+              style={[styles.input, { color: theme.text }]}
+              placeholder="••••••"
+              placeholderTextColor={theme.textSecondary}
+              secureTextEntry={secureTextEntry}
+              autoCapitalize="none"
+              value={password}
+              onChangeText={setPassword}
+              onBlur={() => setIsTouched((prev) => ({ ...prev, password: true }))}
+            />
+            <Pressable
+              onPress={() => setSecureTextEntry((prev) => !prev)}
+              style={styles.eyeIcon}
+            >
+              <SymbolView
+                name={{
+                  ios: secureTextEntry ? 'eye.slash.fill' : 'eye.fill',
+                  android: secureTextEntry ? 'visibility_off' : 'visibility',
+                  web: secureTextEntry ? 'visibility_off' : 'visibility',
+                }}
+                size={20}
+                tintColor={theme.textSecondary}
+              />
+            </Pressable>
+          </View>
+          {Boolean(passwordError) && (
+            <AppText variant="caption" style={styles.errorText}>
+              {passwordError}
             </AppText>
           )}
         </View>
@@ -120,17 +161,33 @@ export default function LoginScreen() {
 
       {/* Action Footer */}
       <View style={styles.footer}>
-        <AppText variant="caption" style={[styles.termsText, { color: theme.textSecondary }]}>
-          By continuing, you agree to Yugo&apos;s Terms of Service and Privacy Policy.
-        </AppText>
+        <View style={styles.buttonWrapper}>
+          <Pressable
+            disabled={!isValid || isSaving}
+            style={[
+              styles.loginButton,
+              { opacity: !isValid || isSaving ? 0.5 : 1 }
+            ]}
+            onPress={handleLogin}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <AppText style={styles.loginButtonText}>Login</AppText>
+            )}
+          </Pressable>
+        </View>
 
-        <Button
-          title="Continue"
-          variant="primary"
-          size="lg"
-          disabled={!isValid}
-          onPress={() => router.push('/verify-otp')}
-        />
+        <View style={styles.registerPromptRow}>
+          <AppText variant="caption" style={{ color: theme.textSecondary }}>
+            {"Don't have an account? "}
+          </AppText>
+          <Pressable onPress={() => router.push('/register' as any)}>
+            <AppText variant="caption" style={{ color: palette.primary[600], fontWeight: '600' }}>
+              Create Account
+            </AppText>
+          </Pressable>
+        </View>
       </View>
     </Screen>
   );
@@ -153,9 +210,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pressed: {
-    opacity: 0.7,
-  },
   header: {
     gap: spacing.xs,
   },
@@ -173,40 +227,45 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: spacing.sm,
   },
-  countrySelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-    gap: spacing.xs,
-  },
-  flagEmoji: {
-    fontSize: 16,
-  },
-  divider: {
-    width: 1,
-    height: 20,
-    marginHorizontal: spacing.xs,
-    opacity: 0.2,
-  },
   input: {
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
     paddingHorizontal: spacing.xs,
   },
+  eyeIcon: {
+    padding: spacing.xs,
+  },
   errorText: {
     color: palette.error,
     marginTop: 2,
     marginLeft: 2,
+    fontSize: 12,
   },
   footer: {
     gap: spacing.md,
     marginTop: spacing.xl,
   },
-  termsText: {
-    textAlign: 'center',
-    fontSize: 12,
+  loginButton: {
+    width: '100%',
+    height: 52,
+    backgroundColor: '#2563EB',
+    borderRadius: borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  registerPromptRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  buttonWrapper: {
+    width: '100%',
   },
 });

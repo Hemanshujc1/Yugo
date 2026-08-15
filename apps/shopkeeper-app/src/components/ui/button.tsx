@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   ViewStyle,
+  TextStyle,
 } from 'react-native';
 import { borderRadius } from '@/theme/borders';
 import { palette } from '@/theme/colors';
@@ -23,7 +24,7 @@ export interface ButtonProps extends Omit<PressableProps, 'style'> {
   loading?: boolean;
   disabled?: boolean;
   className?: string;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
 }
 
 export function Button({
@@ -39,28 +40,56 @@ export function Button({
 }: ButtonProps) {
   const isPressDisabled = disabled || loading;
 
+  // Resolve size styles
+  let sizeStyle: ViewStyle = styles.md;
+  let textStyle: TextStyle = styles.mdText;
+  if (size === 'sm') {
+    sizeStyle = styles.sm;
+    textStyle = styles.smText;
+  } else if (size === 'lg') {
+    sizeStyle = styles.lg;
+    textStyle = styles.lgText;
+  }
+
+  // Resolve variant styles
+  let variantStyle: ViewStyle = styles.primary;
+  let variantTextStyle: TextStyle = styles.primaryText;
+  if (variant === 'secondary') {
+    variantStyle = styles.secondary;
+    variantTextStyle = styles.secondaryText;
+  } else if (variant === 'outline') {
+    variantStyle = styles.outline;
+    variantTextStyle = styles.outlineText;
+  } else if (variant === 'ghost') {
+    variantStyle = styles.ghost;
+    variantTextStyle = styles.ghostText;
+  } else if (variant === 'danger') {
+    variantStyle = styles.danger;
+    variantTextStyle = styles.dangerText;
+  }
+
   return (
     <Pressable
       disabled={isPressDisabled}
-      style={({ pressed }) => [
+      android_ripple={{ color: 'rgba(0, 0, 0, 0.12)' }}
+      style={[
         styles.base,
-        styles[size],
-        styles[variant],
-        pressed && styles.pressed,
-        isPressDisabled && styles.disabled,
-        style,
+        sizeStyle,
+        variantStyle,
+        isPressDisabled ? styles.disabled : undefined,
+        style as any,
       ]}
-      className={className}
-      {...rest}>
+      {...rest}
+    >
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' || variant === 'ghost' ? palette.primary[500] : palette.white}
+          color={variant === 'outline' || variant === 'ghost' ? palette.primary[600] : palette.white}
         />
       ) : children ? (
         children
       ) : (
-        <Text style={[styles.textBase, styles[`${size}Text`], styles[`${variant}Text`]]}>
+        <Text style={[styles.textBase, textStyle, variantTextStyle]}>
           {title}
         </Text>
       )}
@@ -73,25 +102,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: borderRadius.md,
   },
   sm: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    minHeight: 34,
+    borderRadius: 8,
   },
   md: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+    width: '100%',
+    minHeight: 48,
+    borderRadius: borderRadius.md,
   },
   lg: {
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
+    width: '100%',
+    minHeight: 54,
+    borderRadius: borderRadius.md,
   },
   primary: {
-    backgroundColor: palette.primary[500],
+    backgroundColor: palette.primary[600],
   },
   secondary: {
-    backgroundColor: palette.gray[100],
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
   },
   outline: {
     backgroundColor: 'transparent',
@@ -103,9 +141,6 @@ const styles = StyleSheet.create({
   },
   danger: {
     backgroundColor: palette.error,
-  },
-  pressed: {
-    opacity: 0.8,
   },
   disabled: {
     opacity: 0.5,
@@ -127,7 +162,7 @@ const styles = StyleSheet.create({
     color: palette.white,
   },
   secondaryText: {
-    color: palette.gray[900],
+    color: '#1F2937',
   },
   outlineText: {
     color: palette.primary[500],

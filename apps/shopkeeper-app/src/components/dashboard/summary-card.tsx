@@ -17,19 +17,19 @@ export function SummaryCard({ title, value, detail, icon, tint }: SummaryCardPro
   const theme = useTheme();
 
   return (
-    <ThemedView type="backgroundElement" style={styles.card}>
-      <View style={styles.iconOuter}>
-        <View style={[styles.iconContainer, { backgroundColor: `${tint}20` }]}> 
-          <SymbolView name={icon as any} size={20} tintColor={tint} />
+    <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
+      <View style={styles.headerRow}>
+        <AppText variant="caption" style={[styles.title, { color: theme.textSecondary }]} numberOfLines={2}>
+          {title}
+        </AppText>
+        <View style={[styles.iconContainer, { backgroundColor: `${tint}20` }]}>
+          <SymbolView name={icon as any} size={18} tintColor={tint} />
         </View>
       </View>
-      <AppText variant="subtitle" style={styles.title}>
-        {title}
-      </AppText>
       <AppText variant="h2" style={styles.value}>
         {value}
       </AppText>
-      <AppText variant="caption" style={[styles.detail, { color: theme.textSecondary }]}> 
+      <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
         {detail}
       </AppText>
     </ThemedView>
@@ -38,27 +38,34 @@ export function SummaryCard({ title, value, detail, icon, tint }: SummaryCardPro
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 24,
-    padding: Spacing.four,
-    gap: Spacing.two,
+    width: '48%',
+    borderRadius: 16,
+    padding: Spacing.three,
+    gap: Spacing.one,
+    borderWidth: 1,
   },
-  iconOuter: {
-    alignItems: 'flex-end',
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: Spacing.one,
   },
   iconContainer: {
-    height: 40,
-    width: 40,
-    borderRadius: 14,
+    height: 32,
+    width: 32,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   title: {
-    lineHeight: 24,
+    flex: 1,
+    fontWeight: '500',
   },
   value: {
-    marginTop: Spacing.one,
-  },
-  detail: {
-    marginTop: Spacing.one,
+    fontWeight: '800',
+    fontSize: 20,
+    lineHeight: 26,
+    marginVertical: Spacing.one,
   },
 });

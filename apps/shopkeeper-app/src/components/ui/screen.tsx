@@ -24,7 +24,7 @@ export interface ScreenProps extends ViewProps {
 export function Screen({
   scrollable = false,
   safeArea = true,
-  safeAreaEdges,
+  safeAreaEdges = ['top', 'left', 'right'],
   style,
   contentContainerStyle,
   scrollViewProps,

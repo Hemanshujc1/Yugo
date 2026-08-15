@@ -1,4 +1,5 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 
 import { AppText, ThemedView } from '@/components';
@@ -15,6 +16,7 @@ export function DashboardHeader({
   date: string;
 }) {
   const theme = useTheme();
+  const router = useRouter();
 
   return (
     <ThemedView type="backgroundElement" style={styles.header}>
@@ -25,9 +27,9 @@ export function DashboardHeader({
             {greeting}
           </AppText>
         </View>
-        <View style={styles.avatar}>
+        <Pressable onPress={() => router.push('/profile')} style={styles.avatar}>
           <SymbolView name={{ ios: 'person.circle.fill', android: 'person', web: 'person' }} size={32} tintColor={theme.text} />
-        </View>
+        </Pressable>
       </View>
       <View style={styles.bottomRow}>
         <AppText variant="caption" style={{ color: theme.textSecondary }}>
