@@ -62,6 +62,15 @@ export function OrderCard({ order, onPress, onAccept, onReject, onMarkReady }: O
           <AppText variant="caption" style={{ color: theme.textSecondary }}>
             {itemCount > 0 ? `${itemCount} ${itemCount === 1 ? 'item' : 'items'} • ` : ''}{deliveryType}
           </AppText>
+          {order?.deliveryDetails?.partner ? (
+            <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '600', marginTop: 2 }}>
+              🚚 Rider: {order.deliveryDetails.partner.name}
+            </AppText>
+          ) : order?.deliveryDetails?.fulfillmentMethod === 'self_delivery' ? (
+            <AppText variant="caption" style={{ color: '#6D28D9', fontWeight: '600', marginTop: 2 }}>
+              📦 Self Delivery (Shopkeeper)
+            </AppText>
+          ) : null}
         </View>
 
         {/* Financial Row: Total & Payment Badge */}
