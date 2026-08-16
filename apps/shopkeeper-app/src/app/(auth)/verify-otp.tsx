@@ -14,11 +14,11 @@ export default function VerifyOtpScreen() {
   const { login } = useAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
-  const inputRefs = useRef<Array<TextInput | null>>([]);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleVerify = () => {
-    login();
-    router.replace('/');
+    login('demo@example.com');
+    router.replace('/' as any);
   };
 
   // Local Countdown Timer logic

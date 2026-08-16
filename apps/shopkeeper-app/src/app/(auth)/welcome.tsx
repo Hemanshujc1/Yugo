@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { Screen, AppText, Button } from '@/components';
+import { Screen, AppText } from '@/components';
 import { palette } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { borderRadius } from '@/theme/borders';
@@ -55,15 +55,26 @@ export default function WelcomeScreen() {
 
       {/* Action Footer */}
       <View style={styles.footer}>
-        <Button
-          title="Get Started"
-          variant="primary"
-          size="lg"
-          onPress={() => router.push('/login')}
-        />
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push('/login' as any)}
+        >
+          <AppText style={styles.loginButtonText}>Login</AppText>
+        </Pressable>
 
-        <Pressable style={styles.secondaryButton} onPress={() => router.push('/explore')}>
-          <AppText variant="caption" style={{ color: palette.primary[500] }}>
+        <View style={styles.registerPromptRow}>
+          <AppText variant="caption" style={{ color: theme.textSecondary }}>
+            {"Don't have an account? "}
+          </AppText>
+          <Pressable onPress={() => router.push('/register' as any)}>
+            <AppText variant="caption" style={{ color: palette.primary[600], fontWeight: '600' }}>
+              Create Account
+            </AppText>
+          </Pressable>
+        </View>
+
+        <Pressable style={styles.secondaryButton} onPress={() => router.push('/explore' as any)}>
+          <AppText variant="caption" style={{ color: palette.primary[600] }}>
             Learn more in Explore Guide →
           </AppText>
         </Pressable>
@@ -157,6 +168,24 @@ const styles = StyleSheet.create({
   footer: {
     gap: spacing.md,
     marginTop: spacing.xl,
+  },
+  loginButton: {
+    width: '100%',
+    height: 52,
+    backgroundColor: '#2563EB',
+    borderRadius: borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  registerPromptRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   secondaryButton: {
     alignItems: 'center',

@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~57.0.9",
+    "@expo/vector-icons": "^15.0.2",
     "@yugo/api-client": "^0.0.0",
     "@yugo/shared-types": "^0.0.0",
     "babel-preset-expo": "^57.0.5",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint-config-expo": "~57.0.1",
     "typescript": "~6.0.3"
   },
   "scripts": {

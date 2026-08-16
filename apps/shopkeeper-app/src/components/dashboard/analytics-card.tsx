@@ -16,15 +16,17 @@ export function AnalyticsCard({ title, value, detail, icon }: AnalyticsCardProps
   const theme = useTheme();
 
   return (
-    <ThemedView type="backgroundElement" style={styles.card}>
+    <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
       <View style={styles.row}>
-        <AppText variant="subtitle">{title}</AppText>
-        <SymbolView name={icon as any} size={16} tintColor={theme.text} />
+        <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '500' }} numberOfLines={1}>
+          {title}
+        </AppText>
+        <SymbolView name={icon as any} size={16} tintColor={theme.textSecondary} />
       </View>
       <AppText variant="h2" style={styles.value}>
         {value}
       </AppText>
-      <AppText variant="caption" style={{ color: theme.textSecondary }}>
+      <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
         {detail}
       </AppText>
     </ThemedView>
@@ -33,9 +35,11 @@ export function AnalyticsCard({ title, value, detail, icon }: AnalyticsCardProps
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 24,
-    padding: Spacing.four,
-    gap: Spacing.two,
+    width: '48%',
+    borderRadius: 16,
+    padding: Spacing.three,
+    gap: Spacing.one,
+    borderWidth: 1,
   },
   row: {
     flexDirection: 'row',
@@ -43,7 +47,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   value: {
-    marginTop: Spacing.two,
-    marginBottom: Spacing.one,
+    fontWeight: '800',
+    fontSize: 20,
+    lineHeight: 26,
+    marginVertical: Spacing.one,
   },
 });

@@ -17,15 +17,15 @@ export function QuickActionCard({ title, description, icon, onPress }: QuickActi
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}>
-      <ThemedView type="backgroundElement" style={styles.card}>
-        <View style={[styles.iconContainer, { backgroundColor: theme.backgroundSelected }]}> 
-          <SymbolView name={icon as any} size={18} tintColor={theme.text} />
+      <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: theme.backgroundSelected }]}>
+          <SymbolView name={icon as any} size={20} tintColor="#2563EB" />
         </View>
         <View style={styles.body}>
-          <AppText variant="subtitle" style={styles.title}>
+          <AppText variant="subtitle" style={styles.title} numberOfLines={1}>
             {title}
           </AppText>
-          <AppText variant="caption" style={[styles.description, { color: theme.textSecondary }]}> 
+          <AppText variant="caption" style={[styles.description, { color: theme.textSecondary }]} numberOfLines={1}>
             {description}
           </AppText>
         </View>
@@ -36,40 +36,38 @@ export function QuickActionCard({ title, description, icon, onPress }: QuickActi
 
 const styles = StyleSheet.create({
   pressable: {
-    borderRadius: 20,
-    width: '48%',
-    minWidth: 150,
-    maxWidth: 180,
-    marginBottom: Spacing.three,
-    alignSelf: 'flex-start',
+    width: '100%',
   },
   pressed: {
     opacity: 0.8,
   },
   card: {
-    borderRadius: 20,
-    padding: Spacing.four,
+    borderRadius: 14,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.three,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
-    alignSelf: 'flex-start',
-    flexShrink: 1,
-    maxHeight: 120,
+    width: '100%',
+    borderWidth: 1,
   },
   iconContainer: {
     height: 40,
     width: 40,
-    borderRadius: 14,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   body: {
-    flexShrink: 1,
+    flex: 1,
   },
   title: {
-    lineHeight: 22,
+    fontWeight: '600',
+    fontSize: 15,
   },
   description: {
-    marginTop: Spacing.one,
+    marginTop: 2,
+    fontSize: 12,
   },
 });

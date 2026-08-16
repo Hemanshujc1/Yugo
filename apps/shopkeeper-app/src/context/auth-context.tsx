@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 export interface User {
   id: string;
   name: string;
+  email: string;
   phone: string;
   shopName: string;
   role: 'shopkeeper' | 'admin';
@@ -11,7 +12,7 @@ export interface User {
 export interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (phone?: string) => void;
+  login: (email: string, name?: string, shopName?: string, phone?: string) => void;
   logout: () => void;
 }
 
@@ -25,12 +26,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (phone?: string) => {
+  const login = (email: string, name?: string, shopName?: string, phone?: string) => {
     setUser({
       id: 'usr_shop_01',
-      name: 'Demo Shopkeeper',
+      name: name || 'Demo Shopkeeper',
+      email: email,
       phone: phone || '+91 98765 43210',
-      shopName: 'Yugo Supermart',
+      shopName: shopName || 'Yugo Supermart',
       role: 'shopkeeper',
     });
     setIsAuthenticated(true);

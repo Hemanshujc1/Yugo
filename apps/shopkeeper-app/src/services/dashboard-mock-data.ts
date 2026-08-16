@@ -57,13 +57,13 @@ export type CategoryItem = {
   count: number;
 };
 
-export const quickActions: Array<{
+export const quickActions: {
   key: string;
   title: string;
   description: string;
   href: QuickActionHref;
   icon: { ios: string; android: string; web: string };
-}> = [
+}[] = [
   {
     key: 'add-product',
     title: 'Add Product',
@@ -103,7 +103,7 @@ export const quickActions: Array<{
     key: 'inventory',
     title: 'Inventory',
     description: 'Check stock levels',
-    href: '/products',
+    href: '/inventory',
     icon: { ios: 'archivebox.fill', android: 'inventory', web: 'inventory' },
   },
   {

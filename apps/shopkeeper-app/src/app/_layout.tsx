@@ -1,11 +1,10 @@
 import "../../global.css";
 import React, { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { useSegments, useRouter } from 'expo-router';
+import { useSegments, useRouter, Stack } from 'expo-router';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { AppProviders } from '@/components/app-providers';
-import AppTabs from '@/components/app-tabs';
 import { useAuth } from '@/hooks';
 
 SplashScreen.preventAutoHideAsync();
@@ -20,18 +19,19 @@ function RootLayoutNav() {
       segments[0] === '(auth)' ||
       segments[0] === 'welcome' ||
       segments[0] === 'login' ||
-      segments[0] === 'verify-otp';
+      segments[0] === 'verify-otp' ||
+      segments[0] === 'register';
 
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect unauthenticated user to welcome screen
-      router.replace('/welcome');
+      router.replace('/welcome' as any);
     } else if (isAuthenticated && inAuthGroup) {
       // Redirect authenticated user to main app
-      router.replace('/');
+      router.replace('/' as any);
     }
   }, [isAuthenticated, segments, router]);
 
-  return <AppTabs />;
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
 
 export default function TabLayout() {
@@ -42,3 +42,4 @@ export default function TabLayout() {
     </AppProviders>
   );
 }
+

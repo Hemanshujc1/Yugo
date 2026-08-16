@@ -1,15 +1,13 @@
-import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
-import { SymbolView } from 'expo-symbols';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { AppText, Screen, ThemedView } from '@/components';
+import { Screen } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useProducts, useOrders } from '@/hooks';
 import {
   analyticsCards,
-  lowStockItems,
   quickActions,
-  recentOrders,
   shopInfo,
   summaryStats,
 } from '@/services/dashboard-mock-data';
@@ -33,11 +31,45 @@ function getGreeting() {
 export default function HomeScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const { products } = useProducts();
+  const { orders, acceptOrder, rejectOrder, markOrderReady } = useOrders();
+
+  // Dynamic products, orders and low stock computations
+  const totalProductsCount = products.length;
+  const lowStockProducts = products.filter(
+    (p) => p.isAvailable && p.stockQuantity <= (p.lowStockThreshold ?? 10) && p.stockQuantity > 0
+  );
+  const lowStockCount = lowStockProducts.length;
+
+  const dynamicSummaryStats = summaryStats.map((stat) => {
+    if (stat.key === 'orders') {
+      return { ...stat, value: orders.length.toString() };
+    }
+    if (stat.key === 'products') {
+      return { ...stat, value: totalProductsCount.toString() };
+    }
+    if (stat.key === 'lowStock') {
+      return { ...stat, value: lowStockCount.toString() };
+    }
+    return stat;
+  });
+
+  const dynamicLowStockItems = lowStockProducts.map((p) => ({
+    id: p.id,
+    product: p.name,
+    quantity: p.stockQuantity,
+    threshold: p.lowStockThreshold ?? 10,
+  }));
+
+  const recentOrders = orders.slice(0, 3);
 
   return (
-    <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}> 
+    <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: BottomTabInset + Spacing.four },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <DashboardHeader
@@ -52,14 +84,12 @@ export default function HomeScreen() {
 
         <SectionHeader title="Today Summary" subtitle="Key shop metrics for the day." />
         <View style={styles.summaryGrid}>
-          {summaryStats.map(({ key, ...stat }) => (
+          {dynamicSummaryStats.map(({ key, ...stat }) => (
             <SummaryCard key={key} {...stat} />
           ))}
         </View>
 
-        <View style={styles.sectionTop}>
-          <SectionHeader title="Quick Actions" subtitle="Jump into the most common workflows." />
-        </View>
+        <SectionHeader title="Quick Actions" subtitle="Jump into the most common workflows." />
         <View style={styles.actionsGrid}>
           {quickActions.map((action) => (
             <QuickActionCard
@@ -81,13 +111,16 @@ export default function HomeScreen() {
               onPress={() =>
                 router.push({ pathname: '/order-details', params: { orderId: order.id } })
               }
+              onAccept={() => acceptOrder(order.id)}
+              onReject={() => rejectOrder(order.id)}
+              onMarkReady={() => markOrderReady(order.id)}
             />
           ))}
         </View>
 
         <SectionHeader title="Low Stock" subtitle="Products that need restocking soon." />
         <View style={styles.cardColumn}>
-          {lowStockItems.map((item) => (
+          {dynamicLowStockItems.map((item) => (
             <StockCard key={item.id} item={item} onRestock={() => router.push('/products')} />
           ))}
         </View>
@@ -110,33 +143,24 @@ const styles = StyleSheet.create({
   content: {
     padding: Spacing.four,
     gap: Spacing.four,
-    paddingBottom: BottomTabInset + Spacing.four,
   },
   summaryGrid: {
-    gap: Spacing.three,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: Spacing.two,
   },
   actionsGrid: {
-    gap: Spacing.three,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignContent: 'flex-start',
-    alignItems: 'flex-start',
+    gap: Spacing.two,
     width: '100%',
   },
   cardColumn: {
-    gap: Spacing.three,
+    gap: Spacing.two,
   },
   analyticsGrid: {
-    gap: Spacing.three,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-  },
-  sectionTop: {
-    marginTop: Spacing.two,
+    gap: Spacing.two,
   },
 });
