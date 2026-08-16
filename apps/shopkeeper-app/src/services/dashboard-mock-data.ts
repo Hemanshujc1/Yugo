@@ -96,7 +96,7 @@ export const quickActions: {
     key: 'analytics',
     title: 'Analytics',
     description: 'Track sales and growth',
-    href: '/orders',
+    href: '/analytics',
     icon: { ios: 'chart.bar.xaxis', android: 'analytics', web: 'analytics' },
   },
   {
@@ -110,7 +110,7 @@ export const quickActions: {
     key: 'categories',
     title: 'Categories',
     description: 'Organize product groups',
-    href: '/products',
+    href: '/categories',
     icon: { ios: 'tag.fill', android: 'label', web: 'label' },
   },
   {

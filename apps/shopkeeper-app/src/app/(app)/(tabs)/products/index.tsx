@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, ScrollView, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 import { AppText, Screen, Button, PageHeader } from '@/components';
 import { ProductCard } from '@/components/dashboard';
@@ -16,7 +16,11 @@ type SortDirection = 'asc' | 'desc';
 export default function ProductsScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const params = useLocalSearchParams<{ category?: string }>();
   const { products } = useProducts();
+
+  const [localCategory, setLocalCategory] = useState<string | undefined>(undefined);
+  const activeCategory = params.category || localCategory;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
@@ -32,8 +36,21 @@ export default function ProductsScreen() {
     }
   };
 
-  // Filter products
+  const handleClearCategory = () => {
+    setLocalCategory(undefined);
+    if (params.category) {
+      router.setParams({ category: undefined });
+    }
+  };
+
+  // Filter products by Category + Search + Availability
   const filteredProducts = products.filter((p) => {
+    // 1. Category Filter
+    if (activeCategory && p.category.toLowerCase() !== activeCategory.toLowerCase()) {
+      return false;
+    }
+
+    // 2. Text Search
     const query = searchQuery.toLowerCase().trim();
     const matchesSearch =
       !query ||
@@ -44,6 +61,7 @@ export default function ProductsScreen() {
 
     if (!matchesSearch) return false;
 
+    // 3. Availability / Stock Filter
     switch (filter) {
       case 'available':
         return p.isAvailable;
@@ -58,7 +76,7 @@ export default function ProductsScreen() {
     }
   });
 
-  // Sort products
+  // Sort filtered products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     let result = 0;
     if (sortBy === 'name') {
@@ -74,6 +92,7 @@ export default function ProductsScreen() {
   const productItems = sortedProducts.map(mapProductToItem);
 
   const handleClearFilters = () => {
+    handleClearCategory();
     setSearchQuery('');
     setFilter('all');
   };
@@ -114,7 +133,23 @@ export default function ProductsScreen() {
           onPress={() => router.push('/products/add' as any)}
         />
 
-        {/* Search Input */}
+        {/* Active Category Filter Chip (shown separately from Search Bar) */}
+        {activeCategory && (
+          <View style={styles.categoryChipRow}>
+            <View style={styles.categoryChip}>
+              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '700' }}>
+                Category: {activeCategory}
+              </AppText>
+              <Pressable onPress={handleClearCategory} style={styles.chipCloseBtn}>
+                <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
+                  ✕
+                </AppText>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {/* Search Input (Normal Text Search) */}
         <TextInput
           style={[
             styles.searchInput,
@@ -122,6 +157,8 @@ export default function ProductsScreen() {
           ]}
           placeholder="Search name, category, SKU, barcode..."
           placeholderTextColor={theme.textSecondary}
+          numberOfLines={1}
+          multiline={false}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -181,7 +218,9 @@ export default function ProductsScreen() {
 
         {/* Section Title */}
         <View style={styles.catalogHeader}>
-          <AppText variant="h3">Product Catalog ({productItems.length})</AppText>
+          <AppText variant="h3">
+            Product Catalog ({productItems.length})
+          </AppText>
         </View>
 
         {/* Individual Product Cards List */}
@@ -199,11 +238,13 @@ export default function ProductsScreen() {
           <View style={styles.emptyStateContainer}>
             <AppText variant="subtitle" style={{ fontWeight: '700' }}>No Products Found</AppText>
             <AppText variant="caption" style={{ color: theme.textSecondary, textAlign: 'center' }}>
-              {searchQuery
-                ? `No products matching "${searchQuery}".`
-                : 'No items found matching the selected filter.'}
+              {activeCategory
+                ? `No products found under category "${activeCategory}".`
+                : searchQuery
+                  ? `No products matching "${searchQuery}".`
+                  : 'No items found matching the selected filter.'}
             </AppText>
-            <Button title="Clear Search / Filters" variant="outline" size="sm" onPress={handleClearFilters} />
+            <Button title="Clear Category / Search / Filters" variant="outline" size="sm" onPress={handleClearFilters} />
           </View>
         )}
       </ScrollView>
@@ -219,11 +260,33 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.three,
   },
+  categoryChipRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2563EB15',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.one,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2563EB44',
+    gap: Spacing.two,
+  },
+  chipCloseBtn: {
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+  },
   searchInput: {
     borderRadius: 16,
     borderWidth: 1,
-    padding: Spacing.three,
+    height: 48,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 0,
     fontSize: 15,
+    textAlignVertical: 'center',
   },
   filterContainer: {
     marginVertical: 2,

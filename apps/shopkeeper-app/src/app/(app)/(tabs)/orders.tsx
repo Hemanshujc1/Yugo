@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { AppText, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Screen, ThemedView, PageHeader, Button } from '@/components';
 import { OrderCard } from '@/components/dashboard/order-card';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useOrders } from '@/hooks';
-import type { OrderStatus } from '@/types/order';
+import type { Order, OrderStatus } from '@/types/order';
 
 type FilterTab = 'all' | OrderStatus;
 
 export default function OrdersScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { orders, acceptOrder, rejectOrder, markOrderReady } = useOrders();
+  const {
+    orders,
+    acceptOrder,
+    rejectOrder,
+    markOrderReady,
+    updateDeliveryStatus,
+    markDeliveryPickedUp,
+    simulateRiderAcceptance,
+  } = useOrders();
 
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
+  const [rejectModalOrder, setRejectModalOrder] = useState<Order | null>(null);
 
-  // Badge counts
+  // Live count badges
   const newCount = orders.filter((o) => o.orderStatus === 'new').length;
   const preparingCount = orders.filter((o) => o.orderStatus === 'preparing').length;
   const readyCount = orders.filter((o) => o.orderStatus === 'ready_for_pickup').length;
@@ -36,11 +45,28 @@ export default function OrdersScreen() {
     { key: 'cancelled', label: 'Cancelled', count: cancelledCount },
   ];
 
-  // Filter orders by tab
+  // Filter orders by active queue tab
   const filteredOrders = orders.filter((o) => {
     if (activeTab === 'all') return true;
     return o.orderStatus === activeTab;
   });
+
+  // Sort orders per queue rules
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    const timeA = new Date(a.createdAt).getTime();
+    const timeB = new Date(b.createdAt).getTime();
+    if (activeTab === 'preparing' || activeTab === 'ready_for_pickup' || activeTab === 'out_for_delivery') {
+      return timeA - timeB; // Oldest first for active operational queues
+    }
+    return timeB - timeA; // Newest first for New, Completed, Cancelled, and All
+  });
+
+  const handleConfirmReject = () => {
+    if (rejectModalOrder) {
+      rejectOrder(rejectModalOrder.id);
+      setRejectModalOrder(null);
+    }
+  };
 
   return (
     <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -53,12 +79,16 @@ export default function OrdersScreen() {
       >
         {/* Page Title Header */}
         <PageHeader
-          title="Orders"
-          subtitle="Manage incoming and active orders."
+          title="Orders Queue"
+          subtitle="Manage operational order flow and fulfillment."
         />
 
         {/* Filter Tabs Horizontal Scroll Bar */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterScroll}
+        >
           {tabs.map((tab) => {
             const active = activeTab === tab.key;
             return (
@@ -68,7 +98,7 @@ export default function OrdersScreen() {
                   styles.chip,
                   {
                     backgroundColor: active ? '#2563EB' : theme.backgroundElement,
-                    borderColor: theme.textSecondary,
+                    borderColor: active ? '#2563EB' : '#9CA3AF44',
                   },
                 ]}
                 onPress={() => setActiveTab(tab.key)}
@@ -88,16 +118,22 @@ export default function OrdersScreen() {
         </ScrollView>
 
         {/* Orders Queue List */}
-        {filteredOrders.length > 0 ? (
+        {sortedOrders.length > 0 ? (
           <View style={styles.orderList}>
-            {filteredOrders.map((order) => (
+            {sortedOrders.map((order) => (
               <OrderCard
                 key={order.id}
                 order={order}
-                onPress={() => router.push({ pathname: '/order-details', params: { orderId: order.id } })}
+                onPress={() =>
+                  router.push({ pathname: '/order-details', params: { orderId: order.id } })
+                }
                 onAccept={() => acceptOrder(order.id)}
-                onReject={() => rejectOrder(order.id)}
+                onReject={() => setRejectModalOrder(order)}
                 onMarkReady={() => markOrderReady(order.id)}
+                onStartDelivery={() => updateDeliveryStatus(order.id, 'out_for_delivery')}
+                onMarkPickedUp={() => markDeliveryPickedUp(order.id)}
+                onSimulateRider={() => simulateRiderAcceptance(order.id)}
+                onMarkDelivered={() => updateDeliveryStatus(order.id, 'delivered')}
               />
             ))}
           </View>
@@ -112,16 +148,49 @@ export default function OrdersScreen() {
                 : activeTab === 'preparing'
                   ? 'There are currently no orders being prepared.'
                   : activeTab === 'ready_for_pickup'
-                    ? 'No orders are currently waiting for pickup.'
+                    ? 'No orders are currently waiting for pickup or delivery dispatch.'
                     : activeTab === 'out_for_delivery'
                       ? 'No orders are currently out for delivery.'
                       : activeTab === 'delivered'
                         ? 'No completed orders in history.'
-                        : 'No orders match the selected queue filter.'}
+                        : activeTab === 'cancelled'
+                          ? 'No cancelled orders.'
+                          : 'No orders match the selected queue filter.'}
             </AppText>
           </ThemedView>
         )}
       </ScrollView>
+
+      {/* Confirmation Modal for Order Rejection */}
+      <Modal
+        visible={Boolean(rejectModalOrder)}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRejectModalOrder(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView type="backgroundElement" style={styles.modalCard}>
+            <AppText variant="h3" style={{ fontWeight: '800', color: '#DC2626' }}>
+              Reject Order?
+            </AppText>
+            <AppText variant="body" style={{ color: theme.textSecondary }}>
+              {`Are you sure you want to reject Order ${rejectModalOrder?.orderNumber}? This action cannot be undone and will notify the customer.`}
+            </AppText>
+            <View style={styles.modalBtnRow}>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title="Cancel"
+                  variant="secondary"
+                  onPress={() => setRejectModalOrder(null)}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button title="Confirm Reject" variant="danger" onPress={handleConfirmReject} />
+              </View>
+            </View>
+          </ThemedView>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -153,5 +222,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.two,
     marginTop: Spacing.two,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.four,
+  },
+  modalCard: {
+    borderRadius: 20,
+    padding: Spacing.five,
+    width: '100%',
+    maxWidth: 400,
+    gap: Spacing.three,
+    borderWidth: 1,
+    borderColor: '#9CA3AF33',
+  },
+  modalBtnRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    marginTop: Spacing.one,
   },
 });

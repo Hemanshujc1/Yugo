@@ -5,11 +5,13 @@ import { productService } from '../services/product-service';
 export interface ProductContextType {
   products: Product[];
   loading: boolean;
+  lastStockUpdateTimestamp: string | null;
   refreshProducts: () => Promise<void>;
   addProduct: (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Product>;
   updateProduct: (id: string, updates: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>) => Promise<Product>;
   deleteProduct: (id: string) => Promise<boolean>;
   updateStock: (id: string, quantity: number) => Promise<Product>;
+  recordOfflineStockUpdate: (items: { productId: string; quantitySold: number }[]) => Promise<Product[]>;
   updateAvailability: (id: string, availability: boolean) => Promise<Product>;
 }
 
@@ -22,12 +24,15 @@ export interface ProductProviderProps {
 export function ProductProvider({ children }: ProductProviderProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [lastStockUpdateTimestamp, setLastStockUpdateTimestamp] = useState<string | null>(null);
 
   const refreshProducts = async () => {
     setLoading(true);
     try {
       const data = await productService.getProducts();
+      const ts = await productService.getLastStockUpdateTimestamp();
       setProducts(data);
+      setLastStockUpdateTimestamp(ts);
     } catch (error) {
       console.error('Failed to fetch products:', error);
     } finally {
@@ -76,6 +81,12 @@ export function ProductProvider({ children }: ProductProviderProps) {
     return updated;
   };
 
+  const recordOfflineStockUpdate = async (items: { productId: string; quantitySold: number }[]) => {
+    const updated = await productService.recordOfflineStockUpdate(items);
+    await refreshProducts();
+    return updated;
+  };
+
   const updateAvailability = async (id: string, availability: boolean) => {
     const updated = await productService.updateAvailability(id, availability);
     await refreshProducts();
@@ -87,11 +98,13 @@ export function ProductProvider({ children }: ProductProviderProps) {
       value={{
         products,
         loading,
+        lastStockUpdateTimestamp,
         refreshProducts,
         addProduct,
         updateProduct,
         deleteProduct,
         updateStock,
+        recordOfflineStockUpdate,
         updateAvailability,
       }}
     >

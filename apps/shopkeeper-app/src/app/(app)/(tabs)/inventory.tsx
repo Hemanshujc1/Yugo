@@ -5,6 +5,7 @@ import { AppText, Screen, ThemedView, PageHeader, StockStatusBadge, StatCard, Bu
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useProducts } from '@/hooks';
+import { formatRelativeUpdateTime, isStockStale } from '@/services/product-service';
 import type { Product } from '@/types/product';
 
 type FilterOption = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock' | 'unavailable';
@@ -12,7 +13,7 @@ type FilterOption = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock' | 'unavail
 export default function InventoryScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { products, updateStock } = useProducts();
+  const { products, updateStock, lastStockUpdateTimestamp } = useProducts();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<FilterOption>('all');
@@ -26,6 +27,9 @@ export default function InventoryScreen() {
   const inStockCount = products.filter(
     (p) => p.stockQuantity > (p.lowStockThreshold ?? 10)
   ).length;
+
+  const freshnessLabel = formatRelativeUpdateTime(lastStockUpdateTimestamp);
+  const staleNotice = isStockStale(lastStockUpdateTimestamp);
 
   // Search & Filter logic
   const filteredProducts = products.filter((p) => {
@@ -63,12 +67,50 @@ export default function InventoryScreen() {
           { paddingBottom: BottomTabInset + Spacing.four },
         ]}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        {/* Page Title Header */}
+        {/* Uncluttered Page Title Header */}
         <PageHeader
           title="Inventory"
           subtitle="Monitor and adjust your stock levels in real-time."
         />
+
+        {/* Clean Offline Stock Update Action Banner */}
+        <ThemedView type="backgroundElement" style={[styles.actionBannerCard, { borderColor: '#9CA3AF33' }]}>
+          <View style={styles.actionBannerText}>
+            <AppText variant="subtitle" style={{ fontWeight: '700' }}>
+              Offline Stock Update
+            </AppText>
+            <AppText variant="caption" style={{ color: theme.textSecondary }}>
+              Record physical store sales to keep customer stock accurate.
+            </AppText>
+          </View>
+          <Button
+            title="Update Stock"
+            variant="primary"
+            size="sm"
+            onPress={() => router.push('/update-stock' as any)}
+          />
+        </ThemedView>
+
+        {/* Responsive Stock Freshness Card */}
+        <ThemedView type="backgroundElement" style={[styles.freshnessCard, { borderColor: '#9CA3AF33' }]}>
+          <View style={styles.freshnessHeaderRow}>
+            <AppText variant="caption" style={{ color: theme.textSecondary }}>
+              Customer-Facing Stock Freshness
+            </AppText>
+            {staleNotice && (
+              <View style={styles.staleNoticeChip}>
+                <AppText variant="caption" style={{ color: '#B06000', fontWeight: '700' }}>
+                  ⚠️ Stock may need updating
+                </AppText>
+              </View>
+            )}
+          </View>
+          <AppText variant="subtitle" style={{ fontWeight: '700', marginTop: 4 }}>
+            {freshnessLabel}
+          </AppText>
+        </ThemedView>
 
         {/* Responsive Equal 2-Column Summary Metrics */}
         <View style={styles.metricsGrid}>
@@ -86,6 +128,8 @@ export default function InventoryScreen() {
           ]}
           placeholder="Search name, category, SKU, barcode..."
           placeholderTextColor={theme.textSecondary}
+          numberOfLines={1}
+          multiline={false}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -252,6 +296,38 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.four,
   },
+  actionBannerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.four,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: Spacing.two,
+  },
+  actionBannerText: {
+    flex: 1,
+    paddingRight: Spacing.two,
+  },
+  freshnessCard: {
+    padding: Spacing.four,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: Spacing.one,
+  },
+  freshnessHeaderRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  staleNoticeChip: {
+    backgroundColor: '#FEF7E0',
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -261,8 +337,11 @@ const styles = StyleSheet.create({
   searchInput: {
     borderRadius: 16,
     borderWidth: 1,
-    padding: Spacing.three,
+    height: 48,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 0,
     fontSize: 15,
+    textAlignVertical: 'center',
   },
   filterScroll: {
     gap: Spacing.two,
@@ -336,17 +415,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     fontSize: 14,
     fontWeight: '700',
-  },
-  detailsBtn: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#9CA3AF44',
-  },
-  detailsBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#111827',
   },
 });

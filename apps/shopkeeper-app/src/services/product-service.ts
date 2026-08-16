@@ -8,6 +8,26 @@ export function calculateFinalPrice(price: number, discountPercentage?: number):
   return price - (price * discountPercentage / 100);
 }
 
+// Relative time formatting helper (No exact clock timestamps shown!)
+export function formatRelativeUpdateTime(timestampString: string | null): string {
+  if (!timestampString) return 'Stock update not recorded yet';
+  const diffMs = Date.now() - new Date(timestampString).getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  if (diffMins < 1) return 'Updated just now';
+  if (diffMins < 60) return `Updated ${diffMins} min${diffMins === 1 ? '' : 's'} ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `Updated ${diffHours} hr${diffHours === 1 ? '' : 's'} ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Updated yesterday';
+  return `Updated ${diffDays} days ago`;
+}
+
+export function isStockStale(timestampString: string | null): boolean {
+  if (!timestampString) return true;
+  const diffHours = (Date.now() - new Date(timestampString).getTime()) / (1000 * 60 * 60);
+  return diffHours >= 24;
+}
+
 // Initial mock products conforming to the Product model requirements
 let mockProducts: Product[] = [
   {
@@ -92,6 +112,8 @@ let mockProducts: Product[] = [
   },
 ];
 
+let lastStockUpdateTimestamp: string | null = null;
+
 export const productService = {
   getProducts: async (): Promise<Product[]> => {
     return [...mockProducts];
@@ -99,6 +121,10 @@ export const productService = {
 
   getProductById: async (id: string): Promise<Product | undefined> => {
     return mockProducts.find((p) => p.id === id);
+  },
+
+  getLastStockUpdateTimestamp: async (): Promise<string | null> => {
+    return lastStockUpdateTimestamp;
   },
 
   createProduct: async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
@@ -157,7 +183,22 @@ export const productService = {
 
   updateStock: async (id: string, quantity: number): Promise<Product> => {
     if (quantity < 0) throw new Error('Stock quantity cannot be negative');
+    lastStockUpdateTimestamp = new Date().toISOString();
     return productService.updateProduct(id, { stockQuantity: quantity });
+  },
+
+  recordOfflineStockUpdate: async (items: { productId: string; quantitySold: number }[]): Promise<Product[]> => {
+    const updatedProducts: Product[] = [];
+    for (const item of items) {
+      const product = mockProducts.find((p) => p.id === item.productId);
+      if (product) {
+        const newStock = Math.max(0, product.stockQuantity - item.quantitySold);
+        const updated = await productService.updateProduct(product.id, { stockQuantity: newStock });
+        updatedProducts.push(updated);
+      }
+    }
+    lastStockUpdateTimestamp = new Date().toISOString();
+    return updatedProducts;
   },
 
   updateAvailability: async (id: string, isAvailable: boolean): Promise<Product> => {

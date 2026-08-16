@@ -27,14 +27,14 @@ export function StatCard({ title, value, subtitle, accentColor, style }: StatCar
         style,
       ]}
     >
-      <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '500' }} numberOfLines={2}>
+      <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '500' }} numberOfLines={1}>
         {title}
       </AppText>
       <AppText variant="h2" style={[styles.valueText, { color: accentColor || theme.text }]}>
         {value}
       </AppText>
       {Boolean(subtitle) && (
-        <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
+        <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }} numberOfLines={1}>
           {subtitle}
         </AppText>
       )}
@@ -44,8 +44,7 @@ export function StatCard({ title, value, subtitle, accentColor, style }: StatCar
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
-    minWidth: '45%',
+    width: '48%',
     borderRadius: 16,
     padding: Spacing.three,
     gap: Spacing.one,
