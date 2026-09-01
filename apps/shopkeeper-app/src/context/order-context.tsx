@@ -19,7 +19,9 @@ export interface OrderContextType {
   getOrderById: (id: string) => Order | undefined;
   updateOrderStatus: (id: string, newStatus: OrderStatus, reason?: string) => Promise<Order>;
   acceptOrder: (id: string) => Promise<Order>;
+  startPreparingOrder: (id: string) => Promise<Order>;
   rejectOrder: (id: string, reason?: string) => Promise<Order>;
+  cancelOrder: (id: string, reason: string, cancelledBy?: string) => Promise<Order>;
   markOrderReady: (id: string) => Promise<Order>;
   assignDeliveryPartner: (id: string, partner: DeliveryPartnerInfo) => Promise<Order>;
   simulateRiderAcceptance: (id: string) => Promise<Order>;
@@ -30,6 +32,30 @@ export interface OrderContextType {
     targetProvider: 'self_delivery' | 'yugo_partner'
   ) => Promise<Order>;
   markDeliveryPickedUp: (id: string) => Promise<Order>;
+  verifyCustomerPickupOtp: (
+    id: string,
+    otpInput: string
+  ) => Promise<{ success: boolean; message?: string; order?: Order }>;
+  simulateDeliveryCompletion: (
+    id: string,
+    actor: 'yugo_rider' | 'shop_staff'
+  ) => Promise<Order>;
+  reassignShopStaffDelivery: (
+    id: string,
+    staffId: string,
+    staffName: string,
+    staffPhone: string
+  ) => Promise<Order>;
+  reportDeliveryIssue: (
+    id: string,
+    issueType: import('../types/order').DeliveryIssueType,
+    note?: string
+  ) => Promise<Order>;
+  markCodCashCollected: (
+    id: string,
+    amountCollected: number,
+    actorName?: string
+  ) => Promise<Order>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -126,8 +152,20 @@ export function OrderProvider({ children }: OrderProviderProps) {
     return updated;
   };
 
+  const startPreparingOrder = async (id: string) => {
+    const updated = await orderService.startPreparingOrder(id);
+    await refreshOrders();
+    return updated;
+  };
+
   const rejectOrder = async (id: string, reason?: string) => {
     const updated = await orderService.rejectOrder(id, reason);
+    await refreshOrders();
+    return updated;
+  };
+
+  const cancelOrder = async (id: string, reason: string, cancelledBy = 'Shopkeeper') => {
+    const updated = await orderService.cancelOrder(id, reason, cancelledBy);
     await refreshOrders();
     return updated;
   };
@@ -177,6 +215,49 @@ export function OrderProvider({ children }: OrderProviderProps) {
     return updated;
   };
 
+  const verifyCustomerPickupOtp = async (id: string, otpInput: string) => {
+    const res = await orderService.verifyCustomerPickupOtp(id, otpInput);
+    await refreshOrders();
+    return res;
+  };
+
+  const simulateDeliveryCompletion = async (id: string, actor: 'yugo_rider' | 'shop_staff') => {
+    const updated = await orderService.simulateDeliveryCompletion(id, actor);
+    await refreshOrders();
+    return updated;
+  };
+
+  const reassignShopStaffDelivery = async (
+    id: string,
+    staffId: string,
+    staffName: string,
+    staffPhone: string
+  ) => {
+    const updated = await orderService.reassignShopStaffDelivery(id, staffId, staffName, staffPhone);
+    await refreshOrders();
+    return updated;
+  };
+
+  const reportDeliveryIssue = async (
+    id: string,
+    issueType: import('../types/order').DeliveryIssueType,
+    note?: string
+  ) => {
+    const updated = await orderService.reportDeliveryIssue(id, issueType, note);
+    await refreshOrders();
+    return updated;
+  };
+
+  const markCodCashCollected = async (
+    id: string,
+    amountCollected: number,
+    actorName = 'Shopkeeper'
+  ) => {
+    const updated = await orderService.markCodCashCollected(id, amountCollected, actorName);
+    await refreshOrders();
+    return updated;
+  };
+
   return (
     <OrderContext.Provider
       value={{
@@ -189,7 +270,9 @@ export function OrderProvider({ children }: OrderProviderProps) {
         getOrderById,
         updateOrderStatus,
         acceptOrder,
+        startPreparingOrder,
         rejectOrder,
+        cancelOrder,
         markOrderReady,
         assignDeliveryPartner,
         simulateRiderAcceptance,
@@ -197,6 +280,11 @@ export function OrderProvider({ children }: OrderProviderProps) {
         updateDeliveryStatus,
         overrideOrderDeliveryProvider,
         markDeliveryPickedUp,
+        verifyCustomerPickupOtp,
+        simulateDeliveryCompletion,
+        reassignShopStaffDelivery,
+        reportDeliveryIssue,
+        markCodCashCollected,
       }}
     >
       {children}

@@ -1,10 +1,12 @@
 export type OrderStatus =
   | 'new'
+  | 'accepted'
   | 'preparing'
   | 'ready_for_pickup'
   | 'out_for_delivery'
   | 'delivered'
-  | 'cancelled';
+  | 'cancelled'
+  | 'rejected';
 
 export type PaymentMethod = 'COD' | 'UPI' | 'Card';
 export type PaymentStatus = 'Pending' | 'Paid' | 'Refunded';
@@ -40,32 +42,61 @@ export interface DeliveryPartnerInfo {
   currentLocation?: string;
 }
 
+export type DeliveryIssueType =
+  | 'customer_unavailable'
+  | 'wrong_address'
+  | 'reschedule_requested'
+  | 'delivery_delayed'
+  | 'payment_issue'
+  | 'other';
+
+export interface DeliveryIssueReport {
+  id: string;
+  orderId: string;
+  issueType: DeliveryIssueType;
+  note?: string;
+  reportedAt: string;
+  reportedBy: string;
+}
+
 export interface DeliveryDetails {
   fulfillmentMethod: FulfillmentMethod;
   status: DeliveryStatus;
   providerOverride?: 'self_delivery' | 'yugo_partner' | null;
   partner?: DeliveryPartnerInfo;
+  assignedStaff?: {
+    id?: string;
+    name: string;
+    phone: string;
+    role: string;
+  };
   assignedAt?: string;
   dispatchedAt?: string;
   deliveredAt?: string;
+  otp?: string;
   notes?: string;
   smartDeliveryAssigned?: boolean;
+  issueReport?: DeliveryIssueReport;
 }
 
 export interface OrderItemDetail {
   productId: string;
   productName: string;
-  quantity: number;
+  brand?: string;
+  packSize?: string; // e.g. "5 kg", "1 L", "500 g"
+  quantity: number; // Packets / Units
   unitPrice: number;
   discount?: number;
   finalPrice: number;
 }
 
 export interface OrderCustomer {
+  id?: string;
   name: string;
   phone: string;
   address: string;
   city: string;
+  email?: string;
 }
 
 export interface DeliveryPartner {
@@ -79,6 +110,16 @@ export interface TimelineEvent {
   timestamp: string;
   label: string;
   completed: boolean;
+}
+
+export interface OrderStatusEvent {
+  id: string;
+  orderId: string;
+  status: OrderStatus;
+  timestamp: string;
+  actorType: 'System' | 'Shopkeeper' | 'Shop Staff' | 'Yugo Delivery Person' | 'Customer';
+  actorName?: string;
+  note?: string;
 }
 
 export interface Order {
@@ -100,5 +141,13 @@ export interface Order {
   deliveryPartner?: DeliveryPartner;
   deliveryDetails?: DeliveryDetails;
   timeline: TimelineEvent[];
+  statusHistory?: OrderStatusEvent[];
+  rejectionReason?: string;
   cancellationReason?: string;
+  cancelledBy?: string;
+  notes?: string;
+  returnStatus?: 'Not_Returned' | 'Partially_Returned' | 'Fully_Returned';
+  totalRefundedAmount?: number;
+  returnedItemQuantities?: Record<string, number>;
+  inventoryDeducted?: boolean;
 }

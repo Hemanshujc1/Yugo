@@ -217,6 +217,7 @@ export interface ProductItem {
   quantity: number;
   isAvailable: boolean;
   status: 'In stock' | 'Low stock' | 'Out of stock' | 'Unavailable';
+  subtitle?: string;
 }
 
 export function mapProductToItem(p: Product): ProductItem {
@@ -232,15 +233,23 @@ export function mapProductToItem(p: Product): ProductItem {
   const hasDiscount = p.discountPercentage !== undefined && p.discountPercentage > 0;
   const displayPrice = p.finalPrice !== undefined ? p.finalPrice : calculateFinalPrice(p.price, p.discountPercentage);
 
+  let subtitle: string | undefined;
+  if (p.variant) {
+    subtitle = p.variant;
+  } else if (p.brand && p.brand.toLowerCase() !== p.category.toLowerCase()) {
+    subtitle = p.brand;
+  }
+
   return {
     id: p.id,
     name: p.name,
     category: p.category,
-    price: `$${displayPrice.toFixed(2)}`,
-    originalPrice: hasDiscount ? `$${p.price.toFixed(2)}` : undefined,
+    price: `₹${displayPrice.toFixed(2)}`,
+    originalPrice: hasDiscount ? `₹${p.price.toFixed(2)}` : undefined,
     discountPercentage: hasDiscount ? p.discountPercentage : undefined,
     quantity: p.stockQuantity,
     isAvailable: p.isAvailable,
     status,
+    subtitle,
   };
 }

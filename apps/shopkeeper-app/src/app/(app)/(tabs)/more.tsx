@@ -1,37 +1,168 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
 
-import { AppText, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Button, Screen, ThemedView, PageHeader } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { initService } from '@/services/init-service';
+import { useOrders } from '@/hooks';
+
+interface MenuItem {
+  key: string;
+  title: string;
+  description: string;
+  icon: string;
+  href: string;
+}
+
+interface MenuSection {
+  sectionTitle: string;
+  items: MenuItem[];
+}
 
 export default function MoreScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const { refreshOrders } = useOrders();
 
-  const menuItems = [
+  const handleResetDemoData = () => {
+    Alert.alert(
+      'Developer Action: Reset Demo Data',
+      'This will clear local storage and restore the default demo datasets for orders, inventory, catalog, and settings. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset Demo Data',
+          style: 'destructive',
+          onPress: async () => {
+            await initService.resetDemoData();
+            await refreshOrders();
+            Alert.alert('Demo Data Reset', 'Local data has been reset to default demo dataset.');
+          },
+        },
+      ]
+    );
+  };
+
+  const menuSections: MenuSection[] = [
     {
-      key: 'customers',
-      title: 'Customers',
-      description: 'View customer profiles, contact history, and order trends',
-      icon: { ios: 'person.2.fill', android: 'groups', web: 'groups' },
-      href: '/customers',
+      sectionTitle: 'SHOP MANAGEMENT',
+      items: [
+        {
+          key: 'shop-profile',
+          title: 'Shop Profile',
+          description: 'Basic store details, phone, address, and logo',
+          icon: '🏪',
+          href: '/shop-profile',
+        },
+        {
+          key: 'shop-settings',
+          title: 'Shop Settings',
+          description: 'Delivery modes, order prep times, and COD settings',
+          icon: '⚙️',
+          href: '/shop-settings',
+        },
+        {
+          key: 'operating-hours',
+          title: 'Operating Hours',
+          description: 'Configure daily store open/close schedules',
+          icon: '⏰',
+          href: '/operating-hours',
+        },
+      ],
     },
     {
-      key: 'profile',
-      title: 'Profile & Settings',
-      description: 'Account information, shop details, and preferences',
-      icon: { ios: 'person.circle.fill', android: 'person', web: 'person' },
-      href: '/profile',
+      sectionTitle: 'OPERATIONS & INVENTORY',
+      items: [
+        {
+          key: 'delivery-ops',
+          title: 'Delivery Operations',
+          description: 'Pickups, active staff assignments, and dispatches',
+          icon: '🚚',
+          href: '/delivery-operations',
+        },
+        {
+          key: 'delivery-staff',
+          title: 'Shop Delivery Staff',
+          description: 'Manage store delivery personnel and active orders',
+          icon: '🛵',
+          href: '/delivery-staff',
+        },
+        {
+          key: 'suppliers',
+          title: 'Suppliers Directory',
+          description: 'Vendor contact directory and stock receiving',
+          icon: '📦',
+          href: '/suppliers',
+        },
+        {
+          key: 'stock-receipts',
+          title: 'Stock Receipts History',
+          description: 'Audit log of incoming supplier stock shipments',
+          icon: '🧾',
+          href: '/stock-receipts',
+        },
+        {
+          key: 'returns',
+          title: 'Returns & Refunds',
+          description: 'Customer returns, stock disposition, and refund logs',
+          icon: '↺',
+          href: '/returns',
+        },
+      ],
     },
     {
-      key: 'explore',
-      title: 'Explore Guide',
-      description: 'Learn about Yugo features, tips, and workflows',
-      icon: { ios: 'book.fill', android: 'explore', web: 'explore' },
-      href: '/explore',
+      sectionTitle: 'BUSINESS & FINANCIALS',
+      items: [
+        {
+          key: 'analytics',
+          title: 'Reports & Analytics',
+          description: 'Revenue trends, top products, and inventory health',
+          icon: '📊',
+          href: '/analytics',
+        },
+        {
+          key: 'customers',
+          title: 'Customer Directory',
+          description: 'Customer order history, contact info, and lifetime spend',
+          icon: '👥',
+          href: '/customers',
+        },
+        {
+          key: 'earnings',
+          title: 'Earnings & Revenue',
+          description: 'Daily gross sales, net earnings, and COD collections',
+          icon: '📈',
+          href: '/earnings',
+        },
+        {
+          key: 'payment-history',
+          title: 'Payment History',
+          description: 'Order payment status, COD logs, and refunds',
+          icon: '💳',
+          href: '/payment-history',
+        },
+      ],
+    },
+    {
+      sectionTitle: 'SYSTEM & PREFERENCES',
+      items: [
+        {
+          key: 'notifications',
+          title: 'Notifications',
+          description: 'View store updates, order alerts, and stock warnings',
+          icon: '🔔',
+          href: '/notifications',
+        },
+        {
+          key: 'notification-preferences',
+          title: 'Notification Settings',
+          description: 'Configure order, inventory, and system alerts',
+          icon: '🔕',
+          href: '/notification-preferences',
+        },
+      ],
     },
   ];
 
@@ -40,44 +171,77 @@ export default function MoreScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: BottomTabInset + Spacing.four },
+          { paddingBottom: BottomTabInset + Spacing.six },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Page Title Header */}
         <PageHeader
           title="More"
-          subtitle="Secondary features and account management."
+          subtitle="Shop settings, operations management, analytics, and business tools."
         />
 
-        {/* Navigation Options List */}
-        <View style={styles.menuList}>
-          {menuItems.map((item) => (
-            <Pressable
-              key={item.key}
-              style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}
-              onPress={() => router.push(item.href as any)}
-            >
-              <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
-                <View style={[styles.iconContainer, { backgroundColor: theme.backgroundSelected }]}>
-                  <SymbolView name={item.icon as any} size={22} tintColor="#2563EB" />
-                </View>
-                <View style={styles.body}>
-                  <AppText variant="subtitle" style={styles.title} numberOfLines={1}>
-                    {item.title}
-                  </AppText>
-                  <AppText variant="caption" style={[styles.description, { color: theme.textSecondary }]}>
-                    {item.description}
-                  </AppText>
-                </View>
-                <SymbolView
-                  name={{ ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' } as any}
-                  size={16}
-                  tintColor={theme.textSecondary}
-                />
-              </ThemedView>
-            </Pressable>
+        <View style={{ gap: Spacing.four, marginTop: Spacing.two }}>
+          {menuSections.map((sec) => (
+            <View key={sec.sectionTitle} style={{ gap: Spacing.two }}>
+              <AppText variant="caption" style={styles.sectionHeader}>
+                {sec.sectionTitle}
+              </AppText>
+
+              {sec.items.map((item) => (
+                <Pressable key={item.key} onPress={() => router.push(item.href as any)}>
+                  <ThemedView
+                    type="backgroundElement"
+                    style={[styles.menuItemCard, { borderColor: '#9CA3AF22' }]}
+                  >
+                    <View style={styles.iconCircle}>
+                      <AppText variant="subtitle">{item.icon}</AppText>
+                    </View>
+
+                    <View style={styles.textContainer}>
+                      <AppText variant="subtitle" style={{ fontWeight: '700' }}>
+                        {item.title}
+                      </AppText>
+                      <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11, marginTop: 1 }}>
+                        {item.description}
+                      </AppText>
+                    </View>
+
+                    <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 16 }}>
+                      ›
+                    </AppText>
+                  </ThemedView>
+                </Pressable>
+              ))}
+            </View>
           ))}
+
+          {/* DEVELOPER TOOLS */}
+          <View style={{ gap: Spacing.two, marginTop: Spacing.two }}>
+            <AppText variant="caption" style={styles.sectionHeader}>
+              DEVELOPER TOOLS
+            </AppText>
+            <ThemedView type="backgroundElement" style={[styles.menuItemCard, { borderColor: '#DC262644' }]}>
+              <View style={[styles.iconCircle, { backgroundColor: '#FEE2E2' }]}>
+                <AppText variant="subtitle">🔄</AppText>
+              </View>
+
+              <View style={styles.textContainer}>
+                <AppText variant="subtitle" style={{ fontWeight: '700', color: '#DC2626' }}>
+                  Reset Demo Data
+                </AppText>
+                <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11, marginTop: 1 }}>
+                  Clear local persistence and restore initial mock state
+                </AppText>
+              </View>
+
+              <Button
+                title="Reset"
+                variant="secondary"
+                size="sm"
+                onPress={handleResetDemoData}
+              />
+            </ThemedView>
+          </View>
         </View>
       </ScrollView>
     </Screen>
@@ -90,44 +254,30 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: Spacing.four,
-    gap: Spacing.four,
   },
-  menuList: {
-    gap: Spacing.three,
+  sectionHeader: {
+    fontWeight: '800',
+    color: '#6B7280',
+    letterSpacing: 0.5,
+    fontSize: 11,
   },
-  pressable: {
-    width: '100%',
-    borderRadius: 16,
-  },
-  pressed: {
-    opacity: 0.8,
-  },
-  card: {
-    borderRadius: 16,
-    padding: Spacing.four,
+  menuItemCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.three,
-    width: '100%',
+    padding: Spacing.four,
+    borderRadius: 16,
     borderWidth: 1,
+    gap: Spacing.three,
   },
-  iconContainer: {
-    height: 44,
-    width: 44,
-    borderRadius: 12,
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#9CA3AF1A',
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
   },
-  body: {
+  textContainer: {
     flex: 1,
-  },
-  title: {
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  description: {
-    marginTop: 2,
-    fontSize: 13,
   },
 });

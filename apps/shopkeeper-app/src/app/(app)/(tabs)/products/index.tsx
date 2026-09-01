@@ -45,23 +45,21 @@ export default function ProductsScreen() {
 
   // Filter products by Category + Search + Availability
   const filteredProducts = products.filter((p) => {
-    // 1. Category Filter
     if (activeCategory && p.category.toLowerCase() !== activeCategory.toLowerCase()) {
       return false;
     }
 
-    // 2. Text Search
     const query = searchQuery.toLowerCase().trim();
     const matchesSearch =
       !query ||
       p.name.toLowerCase().includes(query) ||
       p.category.toLowerCase().includes(query) ||
+      (p.brand && p.brand.toLowerCase().includes(query)) ||
       (p.sku && p.sku.toLowerCase().includes(query)) ||
       (p.barcode && p.barcode.toLowerCase().includes(query));
 
     if (!matchesSearch) return false;
 
-    // 3. Availability / Stock Filter
     switch (filter) {
       case 'available':
         return p.isAvailable;
@@ -114,6 +112,7 @@ export default function ProductsScreen() {
   return (
     <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView
+        stickyHeaderIndices={[3]}
         contentContainerStyle={[
           styles.content,
           { paddingBottom: BottomTabInset + Spacing.four },
@@ -134,7 +133,7 @@ export default function ProductsScreen() {
         />
 
         {/* Active Category Filter Chip (shown separately from Search Bar) */}
-        {activeCategory && (
+        {activeCategory ? (
           <View style={styles.categoryChipRow}>
             <View style={styles.categoryChip}>
               <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '700' }}>
@@ -147,21 +146,25 @@ export default function ProductsScreen() {
               </Pressable>
             </View>
           </View>
+        ) : (
+          <View />
         )}
 
-        {/* Search Input (Normal Text Search) */}
-        <TextInput
-          style={[
-            styles.searchInput,
-            { color: theme.text, borderColor: theme.textSecondary, backgroundColor: theme.backgroundElement },
-          ]}
-          placeholder="Search name, category, SKU, barcode..."
-          placeholderTextColor={theme.textSecondary}
-          numberOfLines={1}
-          multiline={false}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+        {/* Sticky Search Bar Container */}
+        <View style={[styles.stickySearchContainer, { backgroundColor: theme.background, borderBottomWidth: 1, borderColor: '#9CA3AF33' }]}>
+          <TextInput
+            style={[
+              styles.searchInput,
+              { color: theme.text, borderColor: theme.textSecondary, backgroundColor: theme.backgroundElement },
+            ]}
+            placeholder="Search products, brands, or barcodes"
+            placeholderTextColor={theme.textSecondary}
+            numberOfLines={1}
+            multiline={false}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
 
         {/* Filter Chips Horizontal Row */}
         <View style={styles.filterContainer}>
@@ -279,13 +282,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
+  stickySearchContainer: {
+    paddingVertical: Spacing.one,
+    zIndex: 10,
+  },
   searchInput: {
     borderRadius: 16,
     borderWidth: 1,
     height: 48,
     paddingHorizontal: Spacing.three,
     paddingVertical: 0,
-    fontSize: 15,
+    fontSize: 14,
     textAlignVertical: 'center',
   },
   filterContainer: {

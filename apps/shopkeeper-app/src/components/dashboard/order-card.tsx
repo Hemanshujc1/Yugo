@@ -14,7 +14,8 @@ export interface OrderCardProps {
   onStartDelivery?: () => void;
   onMarkPickedUp?: () => void;
   onSimulateRider?: () => void;
-  onMarkDelivered?: () => void;
+  onVerifyPickupOtp?: () => void;
+  onSimulateDeliveryOtp?: () => void;
 }
 
 function getTimeAgo(dateString: string): string {
@@ -42,7 +43,8 @@ export function OrderCard({
   onStartDelivery,
   onMarkPickedUp,
   onSimulateRider,
-  onMarkDelivered,
+  onVerifyPickupOtp,
+  onSimulateDeliveryOtp,
 }: OrderCardProps) {
   const theme = useTheme();
 
@@ -118,19 +120,19 @@ export function OrderCard({
           <AppText variant="caption" style={{ color: theme.textSecondary }}>
             {itemCount > 0 ? `${itemCount} ${itemCount === 1 ? 'item' : 'items'} • ` : ''}
             {fulfillmentMethod === 'customer_pickup'
-              ? 'Store Pickup'
+              ? '🏪 Customer Self Pickup'
               : fulfillmentMethod === 'self_delivery'
-                ? 'Self Delivery'
-                : 'YuGo Delivery'}
+                ? '📦 Shopkeeper Delivery'
+                : '🚚 YuGo Delivery'}
           </AppText>
 
-          {order?.deliveryDetails?.partner ? (
+          {fulfillmentMethod === 'yugo_partner' && order?.deliveryDetails?.partner ? (
             <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '600', marginTop: 2 }}>
-              🚚 Rider: {order.deliveryDetails.partner.name}
+              🚚 YuGo Rider: {order.deliveryDetails.partner.name}
             </AppText>
           ) : fulfillmentMethod === 'self_delivery' ? (
             <AppText variant="caption" style={{ color: '#6D28D9', fontWeight: '600', marginTop: 2 }}>
-              📦 Self Delivery (Shopkeeper)
+              📦 Staff: Ramesh Kumar (+91 98765 00011)
             </AppText>
           ) : fulfillmentMethod === 'yugo_partner' && order?.orderStatus !== 'cancelled' ? (
             <AppText variant="caption" style={{ color: '#F59E0B', fontWeight: '600', marginTop: 2 }}>
@@ -207,10 +209,22 @@ export function OrderCard({
               />
             </View>
           ) : order?.orderStatus === 'ready_for_pickup' ? (
-            fulfillmentMethod === 'self_delivery' && onStartDelivery ? (
+            fulfillmentMethod === 'customer_pickup' && onVerifyPickupOtp ? (
               <View style={styles.singleActionRow}>
                 <Button
-                  title="Start Delivery"
+                  title="Verify Pickup OTP"
+                  variant="primary"
+                  size="sm"
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    onVerifyPickupOtp();
+                  }}
+                />
+              </View>
+            ) : fulfillmentMethod === 'self_delivery' && onStartDelivery ? (
+              <View style={styles.singleActionRow}>
+                <Button
+                  title="Start Staff Delivery"
                   variant="primary"
                   size="sm"
                   onPress={(e) => {
@@ -219,22 +233,10 @@ export function OrderCard({
                   }}
                 />
               </View>
-            ) : fulfillmentMethod === 'customer_pickup' && onMarkPickedUp ? (
-              <View style={styles.singleActionRow}>
-                <Button
-                  title="Complete Customer Pickup"
-                  variant="primary"
-                  size="sm"
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onMarkPickedUp();
-                  }}
-                />
-              </View>
             ) : order?.deliveryDetails?.partner && onMarkPickedUp ? (
               <View style={styles.singleActionRow}>
                 <Button
-                  title="Mark as Picked Up by Rider"
+                  title="Mark Picked Up by Rider"
                   variant="primary"
                   size="sm"
                   onPress={(e) => {
@@ -260,15 +262,19 @@ export function OrderCard({
                 <Button title="View Details" variant="secondary" size="sm" onPress={onPress} />
               </View>
             )
-          ) : order?.orderStatus === 'out_for_delivery' && onMarkDelivered ? (
+          ) : order?.orderStatus === 'out_for_delivery' && onSimulateDeliveryOtp ? (
             <View style={styles.singleActionRow}>
               <Button
-                title="Mark Delivered"
-                variant="primary"
+                title={
+                  fulfillmentMethod === 'self_delivery'
+                    ? '[ Dev: Simulate Staff OTP ]'
+                    : '[ Dev: Simulate Rider OTP ]'
+                }
+                variant="secondary"
                 size="sm"
                 onPress={(e) => {
                   e.stopPropagation();
-                  onMarkDelivered();
+                  onSimulateDeliveryOtp();
                 }}
               />
             </View>

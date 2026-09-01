@@ -1,6 +1,11 @@
+import { CatalogProduct, ShopInventoryItem } from './inventory';
+
 export interface Product {
   id: string;
+  catalogProductId?: string;
   name: string;
+  brand?: string;
+  variant?: string;
   category: string;
   images: string[];
   price: number;
@@ -19,3 +24,4 @@ export interface Product {
   updatedAt: string;
 }
 
+export type { CatalogProduct, ShopInventoryItem };

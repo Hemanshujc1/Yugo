@@ -34,7 +34,7 @@ export function PageHeader({ title, subtitle, action, style }: PageHeaderProps) 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingVertical: Spacing.two,
     gap: Spacing.two,

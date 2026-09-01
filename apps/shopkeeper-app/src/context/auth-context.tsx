@@ -23,8 +23,15 @@ export interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>({
+    id: 'usr_shop_01',
+    name: 'Demo Shopkeeper',
+    email: 'shopkeeper@yugo.com',
+    phone: '+91 98765 43210',
+    shopName: 'Yugo Fresh Mart',
+    role: 'shopkeeper',
+  });
 
   const login = (email: string, name?: string, shopName?: string, phone?: string) => {
     setUser({
