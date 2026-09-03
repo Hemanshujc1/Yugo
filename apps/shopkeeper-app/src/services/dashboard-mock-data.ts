@@ -2,14 +2,14 @@ import type { Href } from 'expo-router';
 
 export const shopInfo = {
   name: 'Yugo Supermart',
-  location: 'Main Street Market',
+  location: 'Main Street Market, Mumbai',
 };
 
 export const summaryStats = [
   {
     key: 'sales',
     title: 'Total Sales Today',
-    value: '$12.4K',
+    value: '₹12.4K',
     detail: '+18% from yesterday',
     icon: { ios: 'dollarsign.circle.fill', android: 'attach_money', web: 'paid' },
     tint: '#2563EB',
@@ -96,7 +96,7 @@ export const quickActions: {
     key: 'analytics',
     title: 'Analytics',
     description: 'Track sales and growth',
-    href: '/orders',
+    href: '/analytics',
     icon: { ios: 'chart.bar.xaxis', android: 'analytics', web: 'analytics' },
   },
   {
@@ -110,7 +110,7 @@ export const quickActions: {
     key: 'categories',
     title: 'Categories',
     description: 'Organize product groups',
-    href: '/products',
+    href: '/categories',
     icon: { ios: 'tag.fill', android: 'label', web: 'label' },
   },
   {
@@ -124,28 +124,28 @@ export const quickActions: {
 
 export const recentOrders = [
   {
-    id: 'ORD-1124',
-    customer: 'Aarya Patel',
-    amount: '$312',
-    status: 'Processing',
+    id: '#YGO-1048',
+    customer: 'Rahul Sharma',
+    amount: '₹684',
+    status: 'New',
     statusColor: '#2563EB',
-    time: '9:12 AM',
+    time: '9:40 AM',
   },
   {
-    id: 'ORD-1123',
-    customer: 'Nina Shah',
-    amount: '$128',
-    status: 'Delivered',
-    statusColor: '#10B981',
-    time: '8:45 AM',
+    id: '#YGO-1049',
+    customer: 'Priya Verma',
+    amount: '₹1240',
+    status: 'New',
+    statusColor: '#2563EB',
+    time: '9:35 AM',
   },
   {
-    id: 'ORD-1122',
-    customer: 'Ravi Kumar',
-    amount: '$529',
-    status: 'Pending',
+    id: '#YGO-1046',
+    customer: 'Amit Patel',
+    amount: '₹450',
+    status: 'Preparing',
     statusColor: '#F59E0B',
-    time: '7:20 AM',
+    time: '9:20 AM',
   },
 ];
 
@@ -174,14 +174,14 @@ export const analyticsCards = [
   {
     key: 'revenue',
     title: 'Revenue',
-    value: '$24.8K',
+    value: '₹24.8K',
     detail: '+15% this week',
     icon: { ios: 'chart.bar.fill', android: 'analytics', web: 'analytics' },
   },
   {
     key: 'profit',
     title: 'Profit',
-    value: '$8.1K',
+    value: '₹8.1K',
     detail: '+12% margin',
     icon: { ios: 'sparkles', android: 'auto_graph', web: 'auto_graph' },
   },
@@ -206,7 +206,7 @@ export const products: ProductItem[] = [
     id: 'SKU-0543',
     name: 'Premium Coffee Beans',
     category: 'Beverages',
-    price: '$16.99',
+    price: '₹320',
     quantity: 28,
     status: 'In stock',
   },
@@ -214,7 +214,7 @@ export const products: ProductItem[] = [
     id: 'SKU-0217',
     name: 'Organic Yogurt',
     category: 'Dairy',
-    price: '$4.49',
+    price: '₹180',
     quantity: 9,
     status: 'Low stock',
   },
@@ -222,7 +222,7 @@ export const products: ProductItem[] = [
     id: 'SKU-0302',
     name: 'Gluten-Free Bread',
     category: 'Bakery',
-    price: '$5.99',
+    price: '₹120',
     quantity: 0,
     status: 'Out of stock',
   },
@@ -230,7 +230,7 @@ export const products: ProductItem[] = [
     id: 'SKU-0188',
     name: 'Sparkling Water',
     category: 'Beverages',
-    price: '$2.49',
+    price: '₹45',
     quantity: 74,
     status: 'In stock',
   },

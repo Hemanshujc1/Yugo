@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, ScrollView, Alert, Switch, ActivityIndicator, Pressable } from 'react-native';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
+
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, Screen, ThemedView } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
@@ -20,7 +22,9 @@ interface FormErrors {
 
 export default function AddProductScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
+  const params = useLocalSearchParams<{ barcode?: string }>();
   const { addProduct } = useProducts();
 
   const [name, setName] = useState('');
@@ -30,7 +34,7 @@ export default function AddProductScreen() {
   const [stockQuantity, setStockQuantity] = useState('0');
   const [lowStockThreshold, setLowStockThreshold] = useState('10');
   const [sku, setSku] = useState('');
-  const [barcode, setBarcode] = useState('');
+  const [barcode, setBarcode] = useState(params.barcode || '');
   const [purchaseDate, setPurchaseDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [description, setDescription] = useState('');
@@ -136,7 +140,13 @@ export default function AddProductScreen() {
   return (
     <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}>
       <Stack.Screen options={{ title: 'Add Product' }} />
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.six }]} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: Math.max(insets.bottom + 32, BottomTabInset + Spacing.six) },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
         <ThemedView type="backgroundElement" style={styles.card}>
           <AppText variant="h2">Add Product</AppText>
           <AppText variant="caption" style={{ color: theme.textSecondary, marginBottom: Spacing.two }}>
@@ -152,7 +162,7 @@ export default function AddProductScreen() {
             <AppText variant="caption">Product Name *</AppText>
             <TextInput
               style={[styles.input, { color: theme.text, borderColor: theme.textSecondary }]}
-              placeholder="e.g. Fresh Apples"
+              placeholder="e.g. Organic Green Tea"
               placeholderTextColor={theme.textSecondary}
               value={name}
               onChangeText={setName}
@@ -164,7 +174,7 @@ export default function AddProductScreen() {
             <AppText variant="caption">Category *</AppText>
             <TextInput
               style={[styles.input, { color: theme.text, borderColor: theme.textSecondary }]}
-              placeholder="e.g. Fruits"
+              placeholder="e.g. Beverages"
               placeholderTextColor={theme.textSecondary}
               value={category}
               onChangeText={setCategory}
@@ -178,7 +188,7 @@ export default function AddProductScreen() {
           </View>
 
           <View style={styles.field}>
-            <AppText variant="caption">Price ($) *</AppText>
+            <AppText variant="caption">Price (₹) *</AppText>
             <TextInput
               style={[styles.input, { color: theme.text, borderColor: theme.textSecondary }]}
               placeholder="0.00"
@@ -208,20 +218,20 @@ export default function AddProductScreen() {
             <View style={[styles.calculatorCard, { backgroundColor: theme.backgroundElement }]}>
               <View style={styles.calcRow}>
                 <AppText variant="caption">Original Price:</AppText>
-                <AppText variant="caption" style={{ fontWeight: '600' }}>${currentPrice.toFixed(2)}</AppText>
+                <AppText variant="caption" style={{ fontWeight: '600' }}>₹{currentPrice.toFixed(2)}</AppText>
               </View>
               {currentDiscount > 0 && (
                 <View style={styles.calcRow}>
                   <AppText variant="caption">Discount ({currentDiscount}%):</AppText>
                   <AppText variant="caption" style={{ color: '#EF4444', fontWeight: '600' }}>
-                    -${(currentPrice - finalPrice).toFixed(2)}
+                    -₹{(currentPrice - finalPrice).toFixed(2)}
                   </AppText>
                 </View>
               )}
               <View style={[styles.calcRow, styles.calcTotalRow]}>
                 <AppText variant="subtitle">Final Price:</AppText>
                 <AppText variant="subtitle" style={{ fontWeight: '800', color: '#10B981' }}>
-                  ${finalPrice.toFixed(2)}
+                  ₹{finalPrice.toFixed(2)}
                 </AppText>
               </View>
             </View>

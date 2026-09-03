@@ -31,9 +31,9 @@ export function ProductCard({ item, onEdit }: { item: ProductItem; onEdit: () =>
       {/* Footer Row: SKU, Price & Action Button */}
       <View style={styles.footerRow}>
         <View style={styles.metaAndPrice}>
-          {Boolean(item.id) && (
+          {Boolean(item.subtitle) && (
             <AppText variant="caption" style={{ color: theme.textSecondary }} numberOfLines={1}>
-              {item.id}
+              {item.subtitle}
             </AppText>
           )}
           <View style={styles.priceRow}>

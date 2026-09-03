@@ -27,11 +27,16 @@ function RootLayoutNav() {
       router.replace('/welcome' as any);
     } else if (isAuthenticated && inAuthGroup) {
       // Redirect authenticated user to main app
-      router.replace('/' as any);
+      router.replace('/(tabs)' as any);
     }
   }, [isAuthenticated, segments, router]);
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(app)" />
+      <Stack.Screen name="(auth)" />
+    </Stack>
+  );
 }
 
 export default function TabLayout() {

@@ -7,9 +7,11 @@ import { palette } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { borderRadius } from '@/theme/borders';
 import { useTheme } from '@/hooks/use-theme';
+import { useAuth } from '@/hooks';
 
 export default function WelcomeScreen() {
   const theme = useTheme();
+  const { login } = useAuth();
 
   return (
     <Screen safeArea scrollable contentContainerStyle={styles.container}>
@@ -57,9 +59,12 @@ export default function WelcomeScreen() {
       <View style={styles.footer}>
         <Pressable
           style={styles.loginButton}
-          onPress={() => router.push('/login' as any)}
+          onPress={() => {
+            login('shopkeeper@yugo.com', 'Demo Shopkeeper', 'Yugo Supermart', '+91 98765 43210');
+            router.replace('/' as any);
+          }}
         >
-          <AppText style={styles.loginButtonText}>Login</AppText>
+          <AppText style={styles.loginButtonText}>Login to Shop Dashboard</AppText>
         </Pressable>
 
         <View style={styles.registerPromptRow}>

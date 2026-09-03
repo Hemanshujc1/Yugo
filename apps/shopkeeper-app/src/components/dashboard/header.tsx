@@ -6,6 +6,7 @@ import { AppText, ThemedView } from '@/components';
 import { useTheme } from '@/hooks/use-theme';
 import { Spacing } from '@/constants/theme';
 
+
 export function DashboardHeader({
   shopName,
   greeting,
@@ -35,9 +36,6 @@ export function DashboardHeader({
         <AppText variant="caption" style={{ color: theme.textSecondary }}>
           {date}
         </AppText>
-        <ThemedView type="backgroundSelected" style={styles.notificationButton}>
-          <SymbolView name={{ ios: 'bell.fill', android: 'notifications', web: 'notifications' } as any} size={18} tintColor={theme.text} />
-        </ThemedView>
       </View>
     </ThemedView>
   );
@@ -71,8 +69,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  notificationButtonWrapper: {
+    position: 'relative',
+  },
   notificationButton: {
     borderRadius: 16,
     padding: Spacing.two,
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#DC2626',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
   },
 });

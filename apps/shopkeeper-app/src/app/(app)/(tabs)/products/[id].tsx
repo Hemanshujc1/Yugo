@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { StyleSheet, View, TextInput, ScrollView, Alert, Switch, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { AppText, Screen, ThemedView, Button, StockStatusBadge } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -20,6 +22,7 @@ interface FormErrors {
 
 export default function ProductDetailsScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams();
   const productId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : '';
@@ -191,7 +194,10 @@ export default function ProductDetailsScreen() {
       <Stack.Screen options={{ title: isEditing ? 'Edit Product' : 'Product Details' }} />
       <ScrollView
         ref={scrollViewRef}
-        contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.six }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: Math.max(insets.bottom + 32, BottomTabInset + Spacing.six) },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         {!isEditing ? (
@@ -212,7 +218,7 @@ export default function ProductDetailsScreen() {
               <View style={styles.row}>
                 <AppText variant="caption">Final Selling Price</AppText>
                 <AppText variant="h3" style={{ color: '#10B981', fontWeight: '800' }}>
-                  ${(product.finalPrice !== undefined ? product.finalPrice : calculateFinalPrice(product.price, product.discountPercentage)).toFixed(2)}
+                  ₹{(product.finalPrice !== undefined ? product.finalPrice : calculateFinalPrice(product.price, product.discountPercentage)).toFixed(2)}
                 </AppText>
               </View>
               {product.discountPercentage !== undefined && product.discountPercentage > 0 && (
@@ -220,7 +226,7 @@ export default function ProductDetailsScreen() {
                   <View style={styles.row}>
                     <AppText variant="caption">Original Price</AppText>
                     <AppText variant="caption" style={styles.originalPriceText}>
-                      ${product.price.toFixed(2)}
+                      ₹{product.price.toFixed(2)}
                     </AppText>
                   </View>
                   <View style={styles.row}>
@@ -400,7 +406,7 @@ export default function ProductDetailsScreen() {
             </View>
 
             <View style={styles.field}>
-              <AppText variant="caption">Price ($) *</AppText>
+              <AppText variant="caption">Price (₹) *</AppText>
               <TextInput
                 style={[styles.input, { color: theme.text, borderColor: theme.textSecondary }]}
                 keyboardType="decimal-pad"
@@ -425,20 +431,20 @@ export default function ProductDetailsScreen() {
               <View style={[styles.calculatorCard, { backgroundColor: theme.backgroundElement }]}>
                 <View style={styles.calcRow}>
                   <AppText variant="caption">Original Price:</AppText>
-                  <AppText variant="caption" style={{ fontWeight: '600' }}>${currentPrice.toFixed(2)}</AppText>
+                  <AppText variant="caption" style={{ fontWeight: '600' }}>₹{currentPrice.toFixed(2)}</AppText>
                 </View>
                 {currentDiscount > 0 && (
                   <View style={styles.calcRow}>
                     <AppText variant="caption">Discount ({currentDiscount}%):</AppText>
                     <AppText variant="caption" style={{ color: '#EF4444', fontWeight: '600' }}>
-                      -${(currentPrice - finalPrice).toFixed(2)}
+                      -₹{(currentPrice - finalPrice).toFixed(2)}
                     </AppText>
                   </View>
                 )}
                 <View style={[styles.calcRow, styles.calcTotalRow]}>
                   <AppText variant="subtitle">Final Price:</AppText>
                   <AppText variant="subtitle" style={{ fontWeight: '800', color: '#10B981' }}>
-                    ${finalPrice.toFixed(2)}
+                    ₹{finalPrice.toFixed(2)}
                   </AppText>
                 </View>
               </View>
