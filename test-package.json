@@ -1,0 +1,1 @@
+{"name":"test-exports","exports":{"./src/*.js":"./src/*.js","./src/*":"./src/*.js"}}
