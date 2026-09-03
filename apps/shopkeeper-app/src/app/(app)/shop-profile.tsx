@@ -7,6 +7,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { Stack } from 'expo-router';
 
@@ -29,11 +30,31 @@ export default function ShopProfileScreen() {
   const [address, setAddress] = useState(profile?.address || '');
   const [city, setCity] = useState(profile?.city || 'Bengaluru');
   const [pincode, setPincode] = useState(profile?.pincode || '560038');
-  const [logoUri, setLogoUri] = useState<string | undefined>(profile?.logoUri);
+  const [logoUri, setLogoUri] = useState<string | undefined>(profile?.logoUri || '🏪');
+  const [logoModalVisible, setLogoModalVisible] = useState(false);
 
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
+
+  const logoOptions = [
+    { id: 'store', icon: '🏪', name: 'Supermart Store' },
+    { id: 'cart', icon: '🛒', name: 'Express Retail' },
+    { id: 'organic', icon: '🍎', name: 'Fresh Organic' },
+    { id: 'star', icon: '✨', name: 'Premium Mart' },
+    { id: 'bakery', icon: '🍞', name: 'Bakery & Provisions' },
+    { id: 'letter', icon: shopName ? shopName.charAt(0).toUpperCase() : 'Y', name: 'Initial Letter Avatar' },
+  ];
+
+  const handleSelectLogo = async (icon: string) => {
+    setLogoUri(icon);
+    setLogoModalVisible(false);
+    try {
+      await updateProfile({ logoUri: icon });
+    } catch (err) {
+      console.error('Failed to update logo in profile:', err);
+    }
+  };
 
   const handleSaveProfile = async () => {
     setFormError(null);
@@ -81,16 +102,6 @@ export default function ShopProfileScreen() {
     }
   };
 
-  const handleChangeLogo = () => {
-    // Placeholder image picker action
-    const mockLogos = [
-      'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=200',
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200',
-    ];
-    const nextLogo = logoUri === mockLogos[0] ? mockLogos[1] : mockLogos[0];
-    setLogoUri(nextLogo);
-  };
-
   return (
     <Screen safeArea style={[styles.screen, { backgroundColor: theme.background }]}>
       <Stack.Screen options={{ title: 'Shop Profile' }} />
@@ -107,6 +118,7 @@ export default function ShopProfileScreen() {
           showsVerticalScrollIndicator={false}
         >
           <PageHeader
+            showBack
             title="Shop Profile"
             subtitle="Manage your store details, location, and owner contact information."
           />
@@ -115,8 +127,8 @@ export default function ShopProfileScreen() {
           <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
             <View style={styles.logoRow}>
               <View style={[styles.avatarBox, { backgroundColor: '#2563EB22', borderColor: '#2563EB' }]}>
-                <AppText variant="h1" style={{ color: '#2563EB', fontWeight: '800' }}>
-                  {shopName ? shopName.charAt(0).toUpperCase() : 'Y'}
+                <AppText variant="h1" style={{ color: '#2563EB', fontWeight: '800', fontSize: 32 }}>
+                  {logoUri || (shopName ? shopName.charAt(0).toUpperCase() : 'Y')}
                 </AppText>
               </View>
 
@@ -127,7 +139,7 @@ export default function ShopProfileScreen() {
                 <AppText variant="caption" style={{ color: theme.textSecondary }}>
                   Store Branding & Logo Avatar
                 </AppText>
-                <Pressable onPress={handleChangeLogo} style={{ alignSelf: 'flex-start' }}>
+                <Pressable onPress={() => setLogoModalVisible(true)} style={{ alignSelf: 'flex-start' }}>
                   <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
                     📷 Change Logo
                   </AppText>
@@ -256,6 +268,47 @@ export default function ShopProfileScreen() {
           </ThemedView>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Change Logo Modal */}
+      <Modal visible={logoModalVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <ThemedView type="backgroundElement" style={styles.modalContent}>
+            <AppText variant="h3" style={{ fontWeight: '800' }}>
+              Select Shop Avatar Logo
+            </AppText>
+            <AppText variant="caption" style={{ color: theme.textSecondary }}>
+              Choose a store branding icon for your shop profile:
+            </AppText>
+
+            <View style={styles.logoGrid}>
+              {logoOptions.map((opt) => {
+                const isSelected = logoUri === opt.icon;
+                return (
+                  <Pressable
+                    key={opt.id}
+                    style={[
+                      styles.logoOptionCard,
+                      {
+                        backgroundColor: isSelected ? '#E0F2FE' : theme.backgroundElement,
+                        borderColor: isSelected ? '#2563EB' : '#9CA3AF33',
+                        borderWidth: isSelected ? 2 : 1,
+                      },
+                    ]}
+                    onPress={() => handleSelectLogo(opt.icon)}
+                  >
+                    <AppText variant="h1" style={{ fontSize: 32 }}>{opt.icon}</AppText>
+                    <AppText variant="caption" style={{ fontWeight: isSelected ? '800' : '500', fontSize: 11, textAlign: 'center' }}>
+                      {opt.name}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Button title="Cancel" variant="secondary" onPress={() => setLogoModalVisible(false)} />
+          </ThemedView>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -294,5 +347,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     marginTop: 4,
     fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: '#00000088',
+    justifyContent: 'center',
+    padding: Spacing.four,
+  },
+  modalContent: {
+    borderRadius: 20,
+    padding: Spacing.five,
+    gap: Spacing.three,
+  },
+  logoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.two,
+    paddingVertical: Spacing.two,
+  },
+  logoOptionCard: {
+    width: '30%',
+    flexGrow: 1,
+    padding: Spacing.three,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
   },
 });

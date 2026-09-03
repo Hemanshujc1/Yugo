@@ -10,5 +10,6 @@ export * from './page-header';
 export * from './stock-status-badge';
 export * from './status-badge';
 export * from './stat-card';
+export * from './search-bar';
 export * from './ui';
 

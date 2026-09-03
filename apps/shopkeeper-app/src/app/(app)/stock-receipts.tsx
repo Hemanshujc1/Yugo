@@ -3,12 +3,11 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  TextInput,
   Pressable,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 
-import { AppText, Button, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Button, Screen, ThemedView, PageHeader, SearchBar } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useProducts } from '@/hooks';
@@ -64,6 +63,7 @@ export default function StockReceiptsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title="Stock Receipts History"
           subtitle="Audit log of incoming supplier shipments, quantities received, and purchase values."
           action={
@@ -77,19 +77,14 @@ export default function StockReceiptsScreen() {
         />
 
         {/* Search Bar */}
-        <TextInput
-          style={[
-            styles.searchInput,
-            { color: theme.text, borderColor: theme.textSecondary, backgroundColor: theme.backgroundElement },
-          ]}
-          placeholder="Search by Receipt ID (e.g. REC-1028) or Supplier..."
-          placeholderTextColor={theme.textSecondary}
+        <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
+          placeholder="Search by Receipt ID (e.g. REC-1028) or Supplier..."
         />
 
-        {/* Date Filter Pills */}
-        <View style={styles.filterRow}>
+        {/* Date Filter Pills (Horizontal Scroll) */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.two, paddingVertical: 2 }}>
           {filterChips.map((chip) => {
             const active = filterRange === chip.key;
             return (
@@ -116,7 +111,7 @@ export default function StockReceiptsScreen() {
               </Pressable>
             );
           })}
-        </View>
+        </ScrollView>
 
         {/* Receipts List */}
         {!loading && receipts.length > 0 ? (
@@ -138,21 +133,21 @@ export default function StockReceiptsScreen() {
                   }
                 >
                   <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
-                    <View style={{ flex: 1, gap: 2 }}>
+                    <View style={{ flex: 1, gap: 4, paddingRight: Spacing.two }}>
                       <View style={styles.cardHeaderRow}>
                         <AppText variant="subtitle" style={{ fontWeight: '800' }}>
                           Receipt {rec.id}
                         </AppText>
-                        <AppText variant="subtitle" style={{ fontWeight: '700', color: '#2563EB' }}>
+                        <AppText variant="caption" style={{ fontWeight: '800', color: '#2563EB', flexShrink: 1 }} numberOfLines={1}>
                           🏢 {rec.supplierName}
                         </AppText>
                       </View>
 
                       <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                        {rec.totalProductsCount} products • {rec.totalUnitsReceived} sellable units received
+                        {rec.totalProductsCount} products • {rec.totalUnitsReceived} sellable units
                       </AppText>
                       <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
-                        Received on {formattedDate}
+                        Received {formattedDate}
                       </AppText>
                     </View>
 
@@ -208,7 +203,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   chip: {
-    flex: 1,
+    paddingHorizontal: Spacing.four,
     paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1,

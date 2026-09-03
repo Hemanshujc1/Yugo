@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleSheet, View, ViewStyle, Pressable } from 'react-native';
 import { AppText } from './ui/text';
 import { useTheme } from '@/hooks/use-theme';
 import { Spacing } from '@/constants/theme';
@@ -10,24 +10,16 @@ export interface StatCardProps {
   subtitle?: string;
   accentColor?: string;
   style?: ViewStyle;
+  onPress?: () => void;
+  selected?: boolean;
 }
 
-export function StatCard({ title, value, subtitle, accentColor, style }: StatCardProps) {
+export function StatCard({ title, value, subtitle, accentColor, style, onPress, selected }: StatCardProps) {
   const theme = useTheme();
 
-  return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: theme.backgroundElement,
-          borderLeftColor: accentColor || '#2563EB',
-          borderLeftWidth: accentColor ? 4 : 0,
-        },
-        style,
-      ]}
-    >
-      <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '500' }} numberOfLines={1}>
+  const cardContent = (
+    <>
+      <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '600' }} numberOfLines={1}>
         {title}
       </AppText>
       <AppText variant="h2" style={[styles.valueText, { color: accentColor || theme.text }]}>
@@ -38,8 +30,30 @@ export function StatCard({ title, value, subtitle, accentColor, style }: StatCar
           {subtitle}
         </AppText>
       )}
-    </View>
+    </>
   );
+
+  const cardStyle = [
+    styles.card,
+    {
+      backgroundColor: selected ? `${accentColor || '#2563EB'}15` : theme.backgroundElement,
+      borderLeftColor: accentColor || '#2563EB',
+      borderLeftWidth: accentColor ? 4 : 0,
+      borderColor: selected ? (accentColor || '#2563EB') : '#9CA3AF22',
+      borderWidth: selected ? 2 : 1,
+    },
+    style,
+  ];
+
+  if (onPress) {
+    return (
+      <Pressable style={cardStyle} onPress={onPress}>
+        {cardContent}
+      </Pressable>
+    );
+  }
+
+  return <View style={cardStyle}>{cardContent}</View>;
 }
 
 const styles = StyleSheet.create({

@@ -88,6 +88,12 @@ export default function SupplierDetailsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        <PageHeader
+          showBack
+          title={supplier ? supplier.name : 'Supplier Profile'}
+          subtitle={supplier ? `City: ${supplier.city}` : ''}
+        />
+
         {supplier && (
           <>
             {/* Supplier Info Header Card */}

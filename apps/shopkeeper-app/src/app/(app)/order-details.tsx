@@ -139,34 +139,43 @@ export default function OrderDetailsScreen() {
       >
         {/* A. ORDER HEADER */}
         <PageHeader
-          title={order.orderNumber}
-          subtitle={`Received ${new Date(order.createdAt).toLocaleString()}`}
-          action={<StatusBadge status={order.orderStatus} size="md" />}
+          showBack
+          title={`Order ${order.orderNumber}`}
+          subtitle={`Placed on ${new Date(order.createdAt).toLocaleString()}`}
+          action={<StatusBadge status={order.orderStatus} size="sm" />}
         />
 
         {/* B. CUSTOMER INFORMATION */}
         <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
-          <View style={styles.cardHeaderRow}>
-            <AppText variant="subtitle" style={{ fontWeight: '800' }}>
-              Customer Details
-            </AppText>
-            <Pressable onPress={() => router.push('/customer-details' as any)}>
-              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
-                View Customer Profile →
-              </AppText>
-            </Pressable>
-          </View>
+          <AppText variant="subtitle" style={{ fontWeight: '800' }}>
+            Customer Details
+          </AppText>
 
           <View style={{ gap: 4 }}>
             <AppText variant="subtitle" style={{ fontWeight: '700' }}>
               {order.customer.name}
             </AppText>
-            <AppText variant="caption" style={{ color: theme.textSecondary }}>
+            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '600' }}>
               📞 Phone: {order.customer.phone}
             </AppText>
             <AppText variant="caption" style={{ color: theme.textSecondary }}>
               📍 Address: {order.customer.address}, {order.customer.city}
             </AppText>
+          </View>
+
+          <View style={{ borderTopWidth: 1, borderTopColor: '#9CA3AF22', paddingTop: Spacing.two, marginTop: 2 }}>
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: '/customer-details' as any,
+                  params: { phone: order.customer.phone },
+                })
+              }
+            >
+              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
+                View Customer Profile →
+              </AppText>
+            </Pressable>
           </View>
         </ThemedView>
 

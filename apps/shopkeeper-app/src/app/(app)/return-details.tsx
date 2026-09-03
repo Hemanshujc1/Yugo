@@ -85,6 +85,7 @@ export default function ReturnDetailsScreen() {
         {returnRecord && (
           <>
             <PageHeader
+              showBack
               title={`Return ${returnRecord.id}`}
               subtitle={`Associated Order: ${returnRecord.orderNumber} • ${formattedDate}`}
             />

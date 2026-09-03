@@ -107,17 +107,18 @@ export default function DeliveryOperationsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title="Delivery Operations"
           subtitle="Manage today's pickups, staff assignments, and active dispatches."
         />
 
-        {/* SUMMARY CARDS GRID */}
+        {/* SUMMARY CARDS GRID (2x2 Grid) */}
         <View style={styles.summaryGrid}>
           <ThemedView type="backgroundElement" style={styles.summaryCard}>
             <AppText variant="h2" style={{ fontWeight: '800', color: '#0284C7' }}>
               {readyOrders.length}
             </AppText>
-            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700' }}>
+            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700', textAlign: 'center' }}>
               Ready for Pickup
             </AppText>
           </ThemedView>
@@ -126,7 +127,7 @@ export default function DeliveryOperationsScreen() {
             <AppText variant="h2" style={{ fontWeight: '800', color: '#7E22CE' }}>
               {outForDeliveryOrders.length}
             </AppText>
-            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700' }}>
+            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700', textAlign: 'center' }}>
               Out for Delivery
             </AppText>
           </ThemedView>
@@ -135,7 +136,7 @@ export default function DeliveryOperationsScreen() {
             <AppText variant="h2" style={{ fontWeight: '800', color: '#10B981' }}>
               {customerPickupOrders.length}
             </AppText>
-            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700' }}>
+            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700', textAlign: 'center' }}>
               Customer Pickups
             </AppText>
           </ThemedView>
@@ -144,7 +145,7 @@ export default function DeliveryOperationsScreen() {
             <AppText variant="h2" style={{ fontWeight: '800', color: '#DC2626' }}>
               {deliveryIssuesOrders.length}
             </AppText>
-            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700' }}>
+            <AppText variant="caption" style={{ color: theme.textSecondary, fontWeight: '700', textAlign: 'center' }}>
               Delivery Issues
             </AppText>
           </ThemedView>
@@ -371,12 +372,15 @@ export default function DeliveryOperationsScreen() {
       {/* Report Delivery Issue Modal */}
       <Modal visible={Boolean(issueOrderId)} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <ThemedView type="backgroundElement" style={styles.modalContent}>
+          <ThemedView type="backgroundElement" style={[styles.modalContent, { maxHeight: '85%' }]}>
             <AppText variant="h3" style={{ fontWeight: '800', color: '#DC2626' }}>
               Report Delivery Issue
             </AppText>
+            <AppText variant="caption" style={{ color: theme.textSecondary }}>
+              Select the issue type encountered during dispatch or delivery:
+            </AppText>
 
-            <View style={{ gap: Spacing.two, paddingVertical: Spacing.two }}>
+            <ScrollView contentContainerStyle={{ gap: Spacing.two, paddingVertical: Spacing.one }} showsVerticalScrollIndicator={false}>
               {[
                 { type: 'customer_unavailable', label: 'Customer Unavailable' },
                 { type: 'wrong_address', label: 'Wrong Address' },
@@ -384,32 +388,44 @@ export default function DeliveryOperationsScreen() {
                 { type: 'delivery_delayed', label: 'Delivery Delayed' },
                 { type: 'payment_issue', label: 'Payment Issue' },
                 { type: 'other', label: 'Other' },
-              ].map((opt) => (
-                <Pressable
-                  key={opt.type}
-                  style={[
-                    styles.reasonOption,
-                    {
-                      backgroundColor: selectedIssueType === opt.type ? '#FEE2E2' : theme.background,
-                      borderColor: selectedIssueType === opt.type ? '#DC2626' : '#9CA3AF44',
-                    },
-                  ]}
-                  onPress={() => setSelectedIssueType(opt.type as DeliveryIssueType)}
-                >
-                  <AppText variant="caption" style={{ fontWeight: selectedIssueType === opt.type ? '800' : '500' }}>
-                    {opt.label}
-                  </AppText>
-                </Pressable>
-              ))}
+              ].map((opt) => {
+                const isSelected = selectedIssueType === opt.type;
+                return (
+                  <Pressable
+                    key={opt.type}
+                    style={[
+                      styles.reasonOption,
+                      {
+                        backgroundColor: isSelected ? '#FEE2E2' : theme.backgroundElement,
+                        borderColor: isSelected ? '#DC2626' : '#9CA3AF44',
+                        borderWidth: isSelected ? 2 : 1,
+                      },
+                    ]}
+                    onPress={() => setSelectedIssueType(opt.type as DeliveryIssueType)}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <AppText variant="subtitle" style={{ fontWeight: isSelected ? '800' : '600', color: isSelected ? '#991B1B' : theme.text }}>
+                        {opt.label}
+                      </AppText>
+                      {isSelected && (
+                        <AppText variant="caption" style={{ color: '#DC2626', fontWeight: '800' }}>✓ Selected</AppText>
+                      )}
+                    </View>
+                  </Pressable>
+                );
+              })}
 
+              <AppText variant="caption" style={{ fontWeight: '700', marginTop: Spacing.two }}>
+                Additional Notes (Optional):
+              </AppText>
               <TextInput
                 style={[styles.input, { color: theme.text, borderColor: theme.textSecondary }]}
-                placeholder="Optional details / note..."
+                placeholder="Details about delay, customer contact, etc..."
                 placeholderTextColor={theme.textSecondary}
                 value={issueNote}
                 onChangeText={setIssueNote}
               />
-            </View>
+            </ScrollView>
 
             <View style={styles.modalBtnRow}>
               <View style={{ flex: 1 }}>
@@ -483,13 +499,16 @@ const styles = StyleSheet.create({
   },
   summaryGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.two,
   },
   summaryCard: {
-    flex: 1,
+    width: '48%',
+    flexGrow: 1,
     padding: Spacing.three,
     borderRadius: 16,
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 2,
     borderWidth: 1,
     borderColor: '#9CA3AF22',

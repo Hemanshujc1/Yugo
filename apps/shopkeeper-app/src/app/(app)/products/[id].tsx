@@ -148,6 +148,7 @@ export default function ProductDetailsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title={catalogProduct.name}
           subtitle={`Brand: ${catalogProduct.brand} • Category: ${catalogProduct.category}`}
           action={
@@ -431,9 +432,11 @@ const styles = StyleSheet.create({
   },
   infoGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.two,
   },
   infoBox: {
+    minWidth: '45%',
     flex: 1,
     padding: Spacing.three,
     borderRadius: 14,

@@ -16,6 +16,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { analyticsService } from '@/services/analytics-service';
 import { reportExportService } from '@/services/report-export-service';
 import { AnalyticsDateRange, FullAnalyticsReport, ComparisonMetric } from '@/types/analytics';
+import { formatCurrencyINR } from '@/utils';
 
 function TrendIndicator({ metric }: { metric: ComparisonMetric }) {
   const isDown = metric.trend === 'down';
@@ -95,6 +96,7 @@ export default function AnalyticsScreen() {
         stickyHeaderIndices={[1]}
       >
         <PageHeader
+          showBack
           title="Reports & Analytics"
           subtitle="Operational business insights, sales trends, inventory health, and customer metrics."
           action={
@@ -169,7 +171,7 @@ export default function AnalyticsScreen() {
                     Gross Sales
                   </AppText>
                   <AppText variant="h2" style={{ fontWeight: '800', color: '#10B981' }}>
-                    ₹{report.salesSummary.grossSales.value.toLocaleString('en-IN')}
+                    {formatCurrencyINR(report.salesSummary.grossSales.value)}
                   </AppText>
                   <TrendIndicator metric={report.salesSummary.grossSales} />
                 </ThemedView>
@@ -180,7 +182,7 @@ export default function AnalyticsScreen() {
                     Net Earnings
                   </AppText>
                   <AppText variant="h2" style={{ fontWeight: '800', color: '#2563EB' }}>
-                    ₹{report.salesSummary.netEarnings.value.toLocaleString('en-IN')}
+                    {formatCurrencyINR(report.salesSummary.netEarnings.value)}
                   </AppText>
                   <TrendIndicator metric={report.salesSummary.netEarnings} />
                 </ThemedView>
@@ -202,7 +204,7 @@ export default function AnalyticsScreen() {
                     Avg Order Value
                   </AppText>
                   <AppText variant="h2" style={{ fontWeight: '800' }}>
-                    ₹{report.salesSummary.avgOrderValue.value.toLocaleString('en-IN')}
+                    {formatCurrencyINR(report.salesSummary.avgOrderValue.value)}
                   </AppText>
                   <TrendIndicator metric={report.salesSummary.avgOrderValue} />
                 </ThemedView>
@@ -216,7 +218,7 @@ export default function AnalyticsScreen() {
                       Customer Refunds Processed
                     </AppText>
                     <AppText variant="subtitle" style={{ fontWeight: '800', color: '#DC2626' }}>
-                      -₹{report.salesSummary.refundsTotal.value.toLocaleString('en-IN')}
+                      {formatCurrencyINR(-report.salesSummary.refundsTotal.value)}
                     </AppText>
                   </View>
                   <Pressable onPress={() => router.push('/returns' as any)}>
@@ -315,7 +317,7 @@ export default function AnalyticsScreen() {
                       </AppText>
                     </View>
                     <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                      ₹{report.channelBreakdown.yugoAmount.toLocaleString('en-IN')} ({report.channelBreakdown.yugoPercentage}%) • {report.channelBreakdown.yugoCount} orders
+                      {formatCurrencyINR(report.channelBreakdown.yugoAmount)} ({report.channelBreakdown.yugoPercentage}%) • {report.channelBreakdown.yugoCount} orders
                     </AppText>
                   </View>
 
@@ -327,7 +329,7 @@ export default function AnalyticsScreen() {
                       </AppText>
                     </View>
                     <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                      ₹{report.channelBreakdown.counterAmount.toLocaleString('en-IN')} ({report.channelBreakdown.counterPercentage}%) • {report.channelBreakdown.counterCount} sales
+                      {formatCurrencyINR(report.channelBreakdown.counterAmount)} ({report.channelBreakdown.counterPercentage}%) • {report.channelBreakdown.counterCount} sales
                     </AppText>
                   </View>
                 </View>
@@ -532,7 +534,7 @@ export default function AnalyticsScreen() {
                     STOCK PURCHASING
                   </AppText>
                   <AppText variant="h3" style={{ fontWeight: '800', marginTop: 2, color: '#10B981' }}>
-                    ₹{report.procurementSummary.totalPurchaseValue.toLocaleString('en-IN')}
+                    {formatCurrencyINR(report.procurementSummary.totalPurchaseValue)}
                   </AppText>
                   <AppText variant="caption" style={{ color: theme.textSecondary }}>
                     {report.procurementSummary.receiptsCount} Stock Receipts

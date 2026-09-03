@@ -3,12 +3,11 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  TextInput,
   Pressable,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 
-import { AppText, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Screen, ThemedView, PageHeader, SearchBar } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useOrders, useProducts } from '@/hooks';
@@ -158,27 +157,18 @@ export default function PaymentHistoryScreen() {
         stickyHeaderIndices={[1]}
       >
         <PageHeader
+          showBack
           title="Payment History"
           subtitle="Audit log of all order payments, COD collections, refunds, and counter sales."
         />
 
         {/* STICKY SEARCH & FILTER BAR */}
         <ThemedView type="backgroundElement" style={[styles.stickySearchBar, { borderColor: '#9CA3AF33' }]}>
-          <View style={[styles.searchBox, { backgroundColor: theme.background, borderColor: '#9CA3AF44' }]}>
-            <AppText variant="caption" style={{ color: theme.textSecondary }}>🔍</AppText>
-            <TextInput
-              style={[styles.searchInput, { color: theme.text }]}
-              placeholder="Search by Order #, customer, or payment method..."
-              placeholderTextColor={theme.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {Boolean(searchQuery) && (
-              <Pressable onPress={() => setSearchQuery('')}>
-                <AppText variant="caption" style={{ color: theme.textSecondary }}>✕</AppText>
-              </Pressable>
-            )}
-          </View>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search by Order #, customer, or payment method..."
+          />
 
           {/* Status Filter Pills */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.one, marginTop: 6 }}>
@@ -227,6 +217,7 @@ export default function PaymentHistoryScreen() {
                 <View style={{ gap: Spacing.two }}>
                   {list.map((rec) => {
                     const badge = financialService.getPaymentBadgeConfig(rec.paymentStatus);
+                    const formattedTime = new Date(rec.createdAtISO).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     return (
                       <Pressable
@@ -240,7 +231,7 @@ export default function PaymentHistoryScreen() {
                         }}
                       >
                         <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
-                          <View style={{ flex: 1 }}>
+                          <View style={{ flex: 1, gap: 2, paddingRight: Spacing.two }}>
                             <View style={styles.cardHeader}>
                               <AppText variant="subtitle" style={{ fontWeight: '800' }}>
                                 {rec.title}
@@ -252,11 +243,11 @@ export default function PaymentHistoryScreen() {
                               </View>
                             </View>
 
-                            <AppText variant="caption" style={{ color: theme.textSecondary, marginTop: 2 }}>
-                              {rec.subtitle} • Method: {rec.paymentMethod}
+                            <AppText variant="caption" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                              {rec.subtitle}
                             </AppText>
-                            <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
-                              {new Date(rec.createdAtISO).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11, fontWeight: '600' }}>
+                              Method: {rec.paymentMethod} • {formattedTime}
                             </AppText>
                           </View>
 

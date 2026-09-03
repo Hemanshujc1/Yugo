@@ -3,12 +3,11 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  TextInput,
   Pressable,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 
-import { AppText, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Screen, ThemedView, PageHeader, SearchBar } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useProducts } from '@/hooks';
@@ -66,27 +65,18 @@ export default function ReturnsScreen() {
         stickyHeaderIndices={[1]}
       >
         <PageHeader
+          showBack
           title="Customer Returns & Refunds"
           subtitle="Audit log of customer returns, inventory dispositions, and processed refunds."
         />
 
         {/* STICKY SEARCH & FILTER BAR */}
         <ThemedView type="backgroundElement" style={[styles.stickySearchBar, { borderColor: '#9CA3AF33' }]}>
-          <View style={[styles.searchBox, { backgroundColor: theme.background, borderColor: '#9CA3AF44' }]}>
-            <AppText variant="caption" style={{ color: theme.textSecondary }}>🔍</AppText>
-            <TextInput
-              style={[styles.searchInput, { color: theme.text }]}
-              placeholder="Search returns by Return #, Order #, or Customer..."
-              placeholderTextColor={theme.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {Boolean(searchQuery) && (
-              <Pressable onPress={() => setSearchQuery('')}>
-                <AppText variant="caption" style={{ color: theme.textSecondary }}>✕</AppText>
-              </Pressable>
-            )}
-          </View>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search returns by Return #, Order #, or Customer..."
+          />
 
           {/* Filter Chips */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.one, marginTop: 6 }}>

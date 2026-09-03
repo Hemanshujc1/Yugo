@@ -18,6 +18,7 @@ import {
 } from '@/components/dashboard';
 import { financialService, CounterSaleRecord } from '@/services/financial-service';
 import { returnService } from '@/services/return-service';
+import { formatCurrencyINR } from '@/utils';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -93,22 +94,37 @@ export default function HomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* 1. HEADER SECTION */}
-        <View style={styles.headerRowWrapper}>
-          <View style={{ flex: 1 }}>
-            <DashboardHeader
-              shopName={profile?.shopName || 'Yugo Fresh Mart'}
-              greeting={`${getGreeting()}, ${(profile?.shopkeeperName || 'Shopkeeper').split(' ')[0]}`}
-              date={new Date().toLocaleDateString(undefined, {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              })}
+        {/* Top Utility Bar */}
+        <View style={styles.topUtilityBar}>
+          <Pressable
+            style={[
+              styles.statusPill,
+              {
+                backgroundColor: availability.isOpen ? '#E6F4EA' : '#FEE2E2',
+                borderColor: availability.isOpen ? '#10B981' : '#EF4444',
+              },
+            ]}
+            onPress={() => toggleAvailability(!availability.isOpen)}
+          >
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: availability.isOpen ? '#10B981' : '#EF4444' },
+              ]}
             />
-          </View>
+            <AppText
+              variant="caption"
+              style={{
+                color: availability.isOpen ? '#10B981' : '#DC2626',
+                fontWeight: '800',
+                fontSize: 11,
+              }}
+            >
+              {availability.isOpen ? 'Store Open' : 'Store Closed'}
+            </AppText>
+          </Pressable>
 
-          <View style={styles.headerRightActions}>
-            {/* Notification Bell Icon */}
+          <View style={styles.rightIconRow}>
             <Pressable style={styles.bellBtn} onPress={() => router.push('/notifications' as any)}>
               <AppText variant="h3">🔔</AppText>
               {unreadCount > 0 && (
@@ -120,36 +136,22 @@ export default function HomeScreen() {
               )}
             </Pressable>
 
-            {/* Shop Availability Status Pill */}
-            <Pressable
-              style={[
-                styles.statusPill,
-                {
-                  backgroundColor: availability.isOpen ? '#E6F4EA' : '#FEE2E2',
-                  borderColor: availability.isOpen ? '#10B981' : '#EF4444',
-                },
-              ]}
-              onPress={() => router.push('/shop-settings' as any)}
-            >
-              <View
-                style={[
-                  styles.statusDot,
-                  { backgroundColor: availability.isOpen ? '#10B981' : '#EF4444' },
-                ]}
-              />
-              <AppText
-                variant="caption"
-                style={{
-                  color: availability.isOpen ? '#10B981' : '#DC2626',
-                  fontWeight: '800',
-                  fontSize: 11,
-                }}
-              >
-                {availability.isOpen ? 'Open' : 'Closed'}
-              </AppText>
+            <Pressable style={styles.settingsBtn} onPress={() => router.push('/shop-settings' as any)}>
+              <AppText variant="h3">⚙️</AppText>
             </Pressable>
           </View>
         </View>
+
+        {/* 1. HEADER SECTION (Full Content Width) */}
+        <DashboardHeader
+          shopName={profile?.shopName || 'Yugo Fresh Mart'}
+          greeting={`${getGreeting()}, ${(profile?.shopkeeperName || 'Shopkeeper').split(' ')[0]}`}
+          date={new Date().toLocaleDateString(undefined, {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+          })}
+        />
 
         {/* 2. SHOP CLOSED BANNER */}
         {!availability.isOpen && (
@@ -213,7 +215,7 @@ export default function HomeScreen() {
                       COD Cash Collection
                     </AppText>
                     <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                      ₹{pendingCODTotalAmount.toLocaleString('en-IN')} pending ({codPendingOrders.length} COD orders)
+                      {formatCurrencyINR(pendingCODTotalAmount)} pending ({codPendingOrders.length} COD orders)
                     </AppText>
                   </View>
                   <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
@@ -336,27 +338,23 @@ export default function HomeScreen() {
         />
 
         <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#10B98144' }]}>
-          <View style={styles.businessHeaderRow}>
-            <View style={{ flex: 1 }}>
-              <AppText variant="caption" style={{ color: theme.textSecondary, textTransform: 'uppercase', fontWeight: '800' }}>
-                Today Gross Revenue
+          <View style={{ gap: Spacing.one }}>
+            <AppText variant="caption" style={{ color: theme.textSecondary, textTransform: 'uppercase', fontWeight: '800', letterSpacing: 0.5 }}>
+              TODAY GROSS REVENUE
+            </AppText>
+            <AppText variant="h1" style={{ fontWeight: '900', color: '#10B981', fontSize: 32, lineHeight: 38 }}>
+              {formatCurrencyINR(todaySummary.grossSales)}
+            </AppText>
+            <Pressable onPress={() => router.push('/analytics' as any)} style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800', fontSize: 13 }}>
+                View Reports →
               </AppText>
-              <AppText variant="h1" style={{ fontWeight: '800', color: '#10B981', marginTop: 2 }}>
-                ₹{todaySummary.grossSales.toLocaleString('en-IN')}
-              </AppText>
-            </View>
-
-            <Button
-              title="View Reports →"
-              variant="secondary"
-              size="sm"
-              onPress={() => router.push('/analytics' as any)}
-            />
+            </Pressable>
           </View>
 
-          <View style={styles.businessStatsGrid}>
+          <View style={[styles.businessStatsGrid, { borderTopWidth: 1, borderTopColor: '#9CA3AF22', paddingTop: Spacing.three, marginTop: Spacing.two }]}>
             <View style={styles.bizStatBox}>
-              <AppText variant="h3" style={{ fontWeight: '800' }}>
+              <AppText variant="h2" style={{ fontWeight: '800' }}>
                 {todaySummary.totalOrdersCount}
               </AppText>
               <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
@@ -365,8 +363,8 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.bizStatBox}>
-              <AppText variant="h3" style={{ fontWeight: '800', color: '#2563EB' }}>
-                ₹{todaySummary.counterSales.toLocaleString('en-IN')}
+              <AppText variant="h2" style={{ fontWeight: '800', color: '#2563EB' }}>
+                {formatCurrencyINR(todaySummary.counterSales)}
               </AppText>
               <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
                 Counter Sales
@@ -374,8 +372,8 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.bizStatBox}>
-              <AppText variant="h3" style={{ fontWeight: '800', color: '#10B981' }}>
-                ₹{todaySummary.netEarnings.toLocaleString('en-IN')}
+              <AppText variant="h2" style={{ fontWeight: '800', color: '#10B981' }}>
+                {formatCurrencyINR(todaySummary.netEarnings)}
               </AppText>
               <AppText variant="caption" style={{ color: theme.textSecondary, fontSize: 11 }}>
                 Net Earnings
@@ -465,18 +463,22 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.four,
   },
-  headerRowWrapper: {
+  topUtilityBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: Spacing.one,
   },
-  headerRightActions: {
+  rightIconRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: Spacing.three,
   },
   bellBtn: {
     position: 'relative',
+    padding: 6,
+  },
+  settingsBtn: {
     padding: 6,
   },
   notifBadge: {

@@ -177,6 +177,7 @@ export default function ReceiveStockScreen() {
         {step === 'builder' && (
           <>
             <PageHeader
+              showBack
               title="Record Incoming Stock"
               subtitle="Select supplier, add received products, enter sellable unit quantities and purchase costs."
             />
@@ -214,6 +215,7 @@ export default function ReceiveStockScreen() {
                         style={{
                           color: active ? '#FFFFFF' : theme.text,
                           fontWeight: active ? '800' : '600',
+                          fontSize: 13,
                         }}
                       >
                         🏢 {sup.name}

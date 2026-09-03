@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 
-import { AppText, Button, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Button, Screen, ThemedView, PageHeader, SearchBar } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { supplierService } from '@/services/supplier-service';
@@ -132,6 +132,7 @@ export default function SuppliersScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title="Supplier Directory"
           subtitle="Manage vendor contacts and procurement sources for incoming stock."
           action={
@@ -145,15 +146,10 @@ export default function SuppliersScreen() {
         />
 
         {/* Search Bar */}
-        <TextInput
-          style={[
-            styles.searchInput,
-            { color: theme.text, borderColor: theme.textSecondary, backgroundColor: theme.backgroundElement },
-          ]}
-          placeholder="Search suppliers by Name, Phone, or City..."
-          placeholderTextColor={theme.textSecondary}
+        <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
+          placeholder="Search suppliers by Name, Phone, or City..."
         />
 
         {/* Suppliers List */}

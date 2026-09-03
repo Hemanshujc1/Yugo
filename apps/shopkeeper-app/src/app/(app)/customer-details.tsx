@@ -16,6 +16,7 @@ import { customerService } from '@/services/customer-service';
 import { financialService } from '@/services/financial-service';
 import { Customer } from '@/types/customer';
 import { Order } from '@/types/order';
+import { formatCurrencyINR } from '@/utils';
 
 type HistoryFilter = 'all' | 'delivered' | 'active' | 'cancelled';
 
@@ -128,6 +129,12 @@ export default function CustomerDetailsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        <PageHeader
+          showBack
+          title={customer ? customer.name : 'Customer Profile'}
+          subtitle={customer ? `Phone: ${customer.phone}` : ''}
+        />
+
         {customer && (
           <>
             {/* Profile Header Card */}
@@ -194,7 +201,7 @@ export default function CustomerDetailsScreen() {
                     Total Spent
                   </AppText>
                   <AppText variant="h2" style={{ fontWeight: '800', color: '#10B981', marginTop: 2 }}>
-                    ₹{customer.totalSpent.toLocaleString('en-IN')}
+                    {formatCurrencyINR(customer.totalSpent)}
                   </AppText>
                 </View>
 
@@ -203,7 +210,7 @@ export default function CustomerDetailsScreen() {
                     Avg Order Value
                   </AppText>
                   <AppText variant="h2" style={{ fontWeight: '800', marginTop: 2 }}>
-                    ₹{customer.averageOrderValue}
+                    {formatCurrencyINR(customer.averageOrderValue)}
                   </AppText>
                 </View>
 

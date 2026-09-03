@@ -5,29 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c66c825-4092-4b3c-860b-e3fb8483d513" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/customers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/customers.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/inventory.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/inventory.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/more.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/more.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/orders.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/orders.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/products/add.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/products/add.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/products/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/(tabs)/products/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/analytics.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/analytics.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/catalog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/catalog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/categories.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/customer-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/customer-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/delivery-operations.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/delivery-operations.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/earnings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/earnings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/inventory-detail/[id].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/inventory-detail/[id].tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/order-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/order-details.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/app-providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/app-providers.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/dashboard/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/dashboard/header.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/dashboard/order-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/dashboard/order-card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/payment-history.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/payment-history.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/products/[id].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/products/[id].tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/receive-stock.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/receive-stock.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/return-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/return-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/returns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/returns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/shop-profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/shop-profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/stock-history.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/stock-history.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/stock-receipts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/stock-receipts.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/supplier-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/supplier-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/suppliers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/app/(app)/suppliers.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/context/order-context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/context/order-context.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/context/product-context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/context/product-context.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/hooks/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/hooks/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/services/dashboard-mock-data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/services/dashboard-mock-data.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/services/order-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/services/order-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/types/order.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/types/order.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/types/product.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/types/product.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/page-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/page-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/stat-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/shopkeeper-app/src/components/stat-card.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -101,6 +101,7 @@ export default function InventoryDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title={cat.name}
           subtitle={`Brand: ${cat.brand} • Pack size: ${cat.variant}`}
           action={<StockStatusBadge status={status} />}
@@ -116,7 +117,7 @@ export default function InventoryDetailScreen() {
               <AppText variant="caption" style={{ color: theme.textSecondary }}>
                 Global Yugo MRP
               </AppText>
-              <AppText variant="subtitle" style={{ fontWeight: '800' }}>
+              <AppText variant="subtitle" style={{ fontWeight: '800', color: '#10B981' }}>
                 ₹{cat.mrp}
               </AppText>
             </View>
@@ -302,9 +303,15 @@ const styles = StyleSheet.create({
   },
   infoGrid: {
     flexDirection: 'row',
-    gap: Spacing.four,
+    flexWrap: 'wrap',
+    gap: Spacing.two,
   },
   infoCol: {
+    minWidth: '45%',
+    flex: 1,
+    padding: Spacing.three,
+    borderRadius: 14,
+    backgroundColor: '#9CA3AF12',
     gap: 2,
   },
   detailRow: {

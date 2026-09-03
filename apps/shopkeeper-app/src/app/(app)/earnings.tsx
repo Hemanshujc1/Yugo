@@ -12,6 +12,7 @@ import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useOrders, useProducts } from '@/hooks';
 import { financialService, CounterSaleRecord } from '@/services/financial-service';
+import { formatCurrencyINR } from '@/utils';
 
 type DateRange = 'today' | 'yesterday' | 'week' | 'month';
 type StatusFilter = 'all' | 'paid' | 'pending' | 'refunded';
@@ -119,6 +120,7 @@ export default function EarningsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title="Earnings & Revenue"
           subtitle="Track your gross sales, counter revenue, platform fees, and net shopkeeper earnings."
         />
@@ -158,40 +160,40 @@ export default function EarningsScreen() {
           <AppText variant="caption" style={{ color: theme.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: '700' }}>
             {summary.dateRangeLabel} Net Shopkeeper Earnings
           </AppText>
-          <AppText variant="h1" style={{ fontSize: 36, fontWeight: '800', color: '#10B981', marginVertical: 4 }}>
-            ₹{summary.netEarnings.toLocaleString('en-IN')}
+          <AppText variant="h1" style={{ fontSize: 34, fontWeight: '900', color: '#10B981', marginVertical: 4 }}>
+            {formatCurrencyINR(summary.netEarnings)}
           </AppText>
           <AppText variant="caption" style={{ color: theme.textSecondary }}>
-            Net earnings after deducting refunds (₹{summary.refundsTotal}) & platform fee (₹{summary.platformDeductions})
+            Net earnings after deducting refunds ({formatCurrencyINR(summary.refundsTotal)}) & platform fee ({formatCurrencyINR(summary.platformDeductions)})
           </AppText>
         </ThemedView>
 
-        {/* 2-Column Metric Grid */}
+        {/* Key Metrics Overview Grid */}
         <View style={styles.metricsGrid}>
           <StatCard
-            title="Gross Sales"
-            value={`₹${summary.grossSales.toLocaleString('en-IN')}`}
-            subtitle={`${summary.totalOrdersCount} total transactions`}
+            title="Gross Revenue"
+            value={formatCurrencyINR(summary.grossSales)}
+            subtitle={`${summary.totalOrdersCount} total sales`}
             style={styles.metricItem}
             accentColor="#2563EB"
           />
           <StatCard
             title="Counter Sales"
-            value={`₹${summary.counterSales.toLocaleString('en-IN')}`}
+            value={formatCurrencyINR(summary.counterSales)}
             subtitle={`${summary.counterSalesCount} offline sales`}
             style={styles.metricItem}
             accentColor="#10B981"
           />
           <StatCard
             title="Yugo Orders"
-            value={`₹${summary.yugoOrdersSales.toLocaleString('en-IN')}`}
+            value={formatCurrencyINR(summary.yugoOrdersSales)}
             subtitle={`${summary.yugoOrdersCount} online orders`}
             style={styles.metricItem}
             accentColor="#8B5CF6"
           />
           <StatCard
             title="Pending Collection"
-            value={`₹${summary.pendingPaymentsTotal.toLocaleString('en-IN')}`}
+            value={formatCurrencyINR(summary.pendingPaymentsTotal)}
             subtitle={`${summary.pendingOrdersCount} COD orders`}
             style={styles.metricItem}
             accentColor="#F59E0B"
@@ -209,7 +211,7 @@ export default function EarningsScreen() {
               Yugo Online Orders
             </AppText>
             <AppText variant="subtitle" style={{ fontWeight: '700' }}>
-              ₹{summary.yugoOrdersSales}
+              {formatCurrencyINR(summary.yugoOrdersSales)}
             </AppText>
           </View>
 
@@ -218,7 +220,7 @@ export default function EarningsScreen() {
               Counter Shop Sales
             </AppText>
             <AppText variant="subtitle" style={{ fontWeight: '700' }}>
-              ₹{summary.counterSales}
+              {formatCurrencyINR(summary.counterSales)}
             </AppText>
           </View>
 
@@ -228,7 +230,7 @@ export default function EarningsScreen() {
                 Refunds
               </AppText>
               <AppText variant="subtitle" style={{ fontWeight: '700', color: '#DC2626' }}>
-                -₹{summary.refundsTotal}
+                {formatCurrencyINR(-summary.refundsTotal)}
               </AppText>
             </View>
           )}
@@ -238,17 +240,19 @@ export default function EarningsScreen() {
               Yugo Platform Fee (5%)
             </AppText>
             <AppText variant="subtitle" style={{ fontWeight: '700', color: theme.textSecondary }}>
-              -₹{summary.platformDeductions}
+              {formatCurrencyINR(-summary.platformDeductions)}
             </AppText>
           </View>
 
-          <View style={[styles.breakdownRow, styles.netRow]}>
-            <AppText variant="h3" style={{ fontWeight: '800' }}>
-              Net Shop Earnings
-            </AppText>
-            <AppText variant="h2" style={{ fontWeight: '800', color: '#10B981' }}>
-              ₹{summary.netEarnings}
-            </AppText>
+          <View style={{ borderTopWidth: 1, borderTopColor: '#9CA3AF33', paddingTop: Spacing.three, marginTop: Spacing.two }}>
+            <View style={{ gap: 2 }}>
+              <AppText variant="caption" style={{ fontWeight: '800', textTransform: 'uppercase', color: theme.textSecondary, letterSpacing: 0.5 }}>
+                Net Shop Earnings
+              </AppText>
+              <AppText variant="h1" style={{ fontWeight: '900', color: '#10B981', fontSize: 28, lineHeight: 34 }}>
+                {formatCurrencyINR(summary.netEarnings)}
+              </AppText>
+            </View>
           </View>
         </ThemedView>
 

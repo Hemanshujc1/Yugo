@@ -3,12 +3,11 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  TextInput,
   Pressable,
 } from 'react-native';
 import { Stack } from 'expo-router';
 
-import { AppText, Screen, ThemedView, PageHeader } from '@/components';
+import { AppText, Screen, ThemedView, PageHeader, SearchBar } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useProducts } from '@/hooks';
@@ -59,27 +58,18 @@ export default function StockHistoryScreen() {
         stickyHeaderIndices={[1]}
       >
         <PageHeader
+          showBack
           title="Stock Movement History"
           subtitle="Audit log of inventory stock changes, sales, and supplier receipts."
         />
 
         {/* STICKY SEARCH & FILTER BAR */}
         <ThemedView type="backgroundElement" style={[styles.stickySearchBar, { borderColor: '#9CA3AF33' }]}>
-          <View style={[styles.searchBox, { backgroundColor: theme.background, borderColor: '#9CA3AF44' }]}>
-            <AppText variant="caption" style={{ color: theme.textSecondary }}>🔍</AppText>
-            <TextInput
-              style={[styles.searchInput, { color: theme.text }]}
-              placeholder="Search stock history by product name or reason..."
-              placeholderTextColor={theme.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {Boolean(searchQuery) && (
-              <Pressable onPress={() => setSearchQuery('')}>
-                <AppText variant="caption" style={{ color: theme.textSecondary }}>✕</AppText>
-              </Pressable>
-            )}
-          </View>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search stock history by product name or reason..."
+          />
 
           {/* Filter Chips Horizontal Scroll */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.one, marginTop: 6 }}>

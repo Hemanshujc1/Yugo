@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   Pressable,
-  TextInput,
   Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -15,6 +14,7 @@ import {
   Screen,
   ThemedView,
   StatCard,
+  SearchBar,
   StockStatusBadge,
 } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
@@ -27,7 +27,7 @@ import { ExcelImportModal } from '@/components/inventory/excel-import-modal';
 import { StockAdjustmentModal } from '@/components/inventory/stock-adjustment-modal';
 import type { ShopInventoryItem } from '@/types/inventory';
 
-type InventoryFilter = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock' | 'unavailable';
+type InventoryFilter = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock' | 'active_catalog' | 'unavailable';
 
 export default function InventoryScreen() {
   const theme = useTheme();
@@ -56,6 +56,7 @@ export default function InventoryScreen() {
     { key: 'in_stock', label: 'In Stock', count: shopInventory.filter((i) => i.isAvailable && i.stockQuantity > i.lowStockThreshold).length },
     { key: 'low_stock', label: 'Low Stock', count: lowStockItems.length },
     { key: 'out_of_stock', label: 'Out of Stock', count: outOfStockItems.length },
+    { key: 'active_catalog', label: 'Active Catalog', count: activeCatalogItems.length },
     { key: 'unavailable', label: 'Unavailable', count: shopInventory.filter((i) => !i.isAvailable).length },
   ];
 
@@ -74,6 +75,7 @@ export default function InventoryScreen() {
     if (filter === 'in_stock') return item.isAvailable && item.stockQuantity > item.lowStockThreshold;
     if (filter === 'low_stock') return item.isAvailable && item.stockQuantity > 0 && item.stockQuantity <= item.lowStockThreshold;
     if (filter === 'out_of_stock') return item.isAvailable && item.stockQuantity === 0;
+    if (filter === 'active_catalog') return item.isAvailable;
     if (filter === 'unavailable') return !item.isAvailable;
     return true;
   });
@@ -101,7 +103,7 @@ export default function InventoryScreen() {
 
           <View style={styles.headerBtnRow}>
             <Pressable
-              style={[styles.historyIconBtn, { backgroundColor: theme.backgroundElement }]}
+              style={[styles.historyIconBtn, { flex: 1, backgroundColor: theme.backgroundElement }]}
               onPress={() => router.push('/stock-history' as any)}
             >
               <AppText variant="caption" style={{ fontWeight: '700' }}>
@@ -109,21 +111,22 @@ export default function InventoryScreen() {
               </AppText>
             </Pressable>
             <Pressable
-              style={[styles.historyIconBtn, { backgroundColor: '#E0F2FE', borderColor: '#2563EB' }]}
+              style={[styles.historyIconBtn, { flex: 1, backgroundColor: '#E0F2FE', borderColor: '#2563EB' }]}
               onPress={() => router.push('/receive-stock' as any)}
             >
               <AppText variant="caption" style={{ fontWeight: '800', color: '#2563EB' }}>
                 📦 Receive Stock
               </AppText>
             </Pressable>
-            <View style={{ flex: 1 }}>
-              <Button
-                title="+ Add"
-                variant="primary"
-                size="sm"
-                onPress={() => setAddMenuVisible(true)}
-              />
-            </View>
+          </View>
+
+          <View style={{ marginTop: Spacing.two, width: '100%' }}>
+            <Button
+              title="+ Add Products to Inventory"
+              variant="primary"
+              size="md"
+              onPress={() => setAddMenuVisible(true)}
+            />
           </View>
         </View>
 
@@ -190,6 +193,8 @@ export default function InventoryScreen() {
             subtitle={`${totalItemsCount} catalog items`}
             style={styles.metricCardItem}
             accentColor="#2563EB"
+            onPress={() => setFilter('all')}
+            selected={filter === 'all'}
           />
           <StatCard
             title="Low Stock Items"
@@ -197,6 +202,8 @@ export default function InventoryScreen() {
             subtitle="Restock soon"
             style={styles.metricCardItem}
             accentColor="#F59E0B"
+            onPress={() => setFilter('low_stock')}
+            selected={filter === 'low_stock'}
           />
           <StatCard
             title="Out of Stock"
@@ -204,6 +211,8 @@ export default function InventoryScreen() {
             subtitle="Customer hidden"
             style={styles.metricCardItem}
             accentColor="#DC2626"
+            onPress={() => setFilter('out_of_stock')}
+            selected={filter === 'out_of_stock'}
           />
           <StatCard
             title="Active Catalog"
@@ -211,20 +220,17 @@ export default function InventoryScreen() {
             subtitle="Visible to buyers"
             style={styles.metricCardItem}
             accentColor="#10B981"
+            onPress={() => setFilter('active_catalog')}
+            selected={filter === 'active_catalog'}
           />
         </View>
 
         {/* Index 4: Sticky Search Bar Container */}
         <View style={[styles.stickySearchContainer, { backgroundColor: theme.background, borderBottomWidth: 1, borderColor: '#9CA3AF33' }]}>
-          <TextInput
-            style={[
-              styles.searchInput,
-              { color: theme.text, borderColor: theme.textSecondary, backgroundColor: theme.backgroundElement },
-            ]}
-            placeholder="Search products, brands, or barcodes"
-            placeholderTextColor={theme.textSecondary}
+          <SearchBar
             value={searchQuery}
             onChangeText={setSearchQuery}
+            placeholder="Search products, brands, or barcodes..."
           />
         </View>
 

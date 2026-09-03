@@ -39,6 +39,7 @@ export default function CategoriesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
+          showBack
           title="Product Categories"
           subtitle="Organize product catalog groups and filter listings."
         />

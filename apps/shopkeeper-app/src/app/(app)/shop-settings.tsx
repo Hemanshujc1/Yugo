@@ -16,6 +16,7 @@ import { AppText, Button, Screen, ThemedView, PageHeader } from '@/components';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useShopSettings } from '@/hooks';
+import { formatCurrencyINR } from '@/utils';
 
 export default function ShopSettingsScreen() {
   const theme = useTheme();
@@ -189,35 +190,39 @@ export default function ShopSettingsScreen() {
 
           {/* Operating Hours Row */}
           <Pressable onPress={() => router.push('/operating-hours' as any)}>
-            <ThemedView type="backgroundElement" style={[styles.cardRow, { borderColor: '#9CA3AF22' }]}>
-              <View style={{ flex: 1 }}>
-                <AppText variant="subtitle" style={{ fontWeight: '800' }}>
-                  Operating Hours
-                </AppText>
-                <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                  Mon–Sat 09:00 AM–09:00 PM • Sun 10:00 AM–06:00 PM
+            <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, gap: 2, paddingRight: Spacing.two }}>
+                  <AppText variant="subtitle" style={{ fontWeight: '800' }}>
+                    Operating Hours
+                  </AppText>
+                  <AppText variant="caption" style={{ color: theme.textSecondary }}>
+                    Mon–Sat 09:00 AM–09:00 PM • Sun 10:00 AM–06:00 PM
+                  </AppText>
+                </View>
+                <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
+                  Configure →
                 </AppText>
               </View>
-              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
-                Configure →
-              </AppText>
             </ThemedView>
           </Pressable>
 
           {/* Order Settings & Preparation Time */}
           <Pressable onPress={handleOpenOrderModal}>
-            <ThemedView type="backgroundElement" style={[styles.cardRow, { borderColor: '#9CA3AF22' }]}>
-              <View style={{ flex: 1 }}>
-                <AppText variant="subtitle" style={{ fontWeight: '800' }}>
-                  Order Settings & Value Limits
-                </AppText>
-                <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                  Min ₹{orderSettings.minimumOrderValue} • Max ₹{orderSettings.maximumOrderValue} • Prep: {orderSettings.defaultPrepTimeMinutes}m
+            <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, gap: 2, paddingRight: Spacing.two }}>
+                  <AppText variant="subtitle" style={{ fontWeight: '800' }}>
+                    Order Settings & Value Limits
+                  </AppText>
+                  <AppText variant="caption" style={{ color: theme.textSecondary }}>
+                    Min {formatCurrencyINR(orderSettings.minimumOrderValue)} • Max {formatCurrencyINR(orderSettings.maximumOrderValue)} • Prep: {orderSettings.defaultPrepTimeMinutes}m
+                  </AppText>
+                </View>
+                <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
+                  Edit →
                 </AppText>
               </View>
-              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
-                Edit Settings →
-              </AppText>
             </ThemedView>
           </Pressable>
         </View>
@@ -273,18 +278,20 @@ export default function ShopSettingsScreen() {
 
           {/* Delivery Staff Nav */}
           <Pressable onPress={() => router.push('/delivery-staff' as any)}>
-            <ThemedView type="backgroundElement" style={[styles.cardRow, { borderColor: '#9CA3AF22' }]}>
-              <View style={{ flex: 1 }}>
-                <AppText variant="subtitle" style={{ fontWeight: '800' }}>
-                  Shop Delivery Staff
-                </AppText>
-                <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                  {activeStaffCount} active delivery staff member(s)
+            <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, gap: 2, paddingRight: Spacing.two }}>
+                  <AppText variant="subtitle" style={{ fontWeight: '800' }}>
+                    Shop Delivery Staff
+                  </AppText>
+                  <AppText variant="caption" style={{ color: theme.textSecondary }}>
+                    {activeStaffCount} active delivery staff member(s)
+                  </AppText>
+                </View>
+                <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
+                  Manage →
                 </AppText>
               </View>
-              <AppText variant="caption" style={{ color: '#2563EB', fontWeight: '800' }}>
-                Manage Staff →
-              </AppText>
             </ThemedView>
           </Pressable>
         </View>
@@ -296,13 +303,20 @@ export default function ShopSettingsScreen() {
           </AppText>
 
           <Pressable onPress={() => router.push('/notification-preferences' as any)}>
-            <ThemedView type="backgroundElement" style={[styles.cardRow, { borderColor: '#9CA3AF22' }]}>
-              <AppText variant="subtitle" style={{ fontWeight: '700' }}>
-                🔔 Notification Settings
-              </AppText>
-              <AppText variant="caption" style={{ color: theme.textSecondary }}>
-                Configure alerts →
-              </AppText>
+            <ThemedView type="backgroundElement" style={[styles.card, { borderColor: '#9CA3AF22' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, gap: 2, paddingRight: Spacing.two }}>
+                  <AppText variant="subtitle" style={{ fontWeight: '800' }}>
+                    🔔 Notification Settings
+                  </AppText>
+                  <AppText variant="caption" style={{ color: theme.textSecondary }}>
+                    Configure alerts and notification preferences
+                  </AppText>
+                </View>
+                <AppText variant="subtitle" style={{ color: '#2563EB', fontWeight: '800' }}>
+                  →
+                </AppText>
+              </View>
             </ThemedView>
           </Pressable>
         </View>
