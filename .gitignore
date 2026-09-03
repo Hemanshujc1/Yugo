@@ -33,6 +33,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Expo
+.expo/
+
+# IDE
+.idea/
+
+# TypeScript build info
+*.tsbuildinfo
+
 # Misc
 .DS_Store
 *.pem
